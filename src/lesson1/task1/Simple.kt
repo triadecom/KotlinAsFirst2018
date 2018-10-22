@@ -73,7 +73,7 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double {
     val versh = 4.445 / 100
     val arsh = 16 * versh
     val sage = 3 * arsh
-    return sagenes*sage+arshins*arsh+vershoks*versh
+    return sagenes * sage + arshins * arsh + vershoks * versh
 }
 
 /**
@@ -83,9 +83,9 @@ fun lengthInMeters(sagenes: Int, arshins: Int, vershoks: Int): Double {
  * Вывести значение того же угла в радианах (например, 0.63256).
  */
 fun angleInRadian(grad: Int, min: Int, sec: Int): Double {
-    val gradrad = 0.0175
-    val minrad = 0.0167
-    val secrad = 0.00028
+    val gradrad = PI / 180
+    val minrad = PI / 10800
+    val secrad = PI / 648000
     return grad * gradrad + min * minrad + sec * secrad
 }
 
@@ -98,7 +98,7 @@ fun angleInRadian(grad: Int, min: Int, sec: Int): Double {
 fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
     val raznX = x1 - x2
     val raznY = y2 - y1
-    return sqrt(sqr(raznX)+sqr(raznY))
+    return sqrt(sqr(raznX) + sqr(raznY))
 }
 
 /**
@@ -108,7 +108,7 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
 fun thirdDigit(number: Int): Int {
-    return number%1000/100
+    return number % 1000 / 100
 }
 
 /**
@@ -119,7 +119,7 @@ fun thirdDigit(number: Int): Int {
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
 fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int {
-    return (hoursArrive-hoursDepart)*60 - minutesDepart + minutesArrive
+    return (hoursArrive - hoursDepart) * 60 - minutesDepart + minutesArrive
 }
 
 /**
@@ -130,10 +130,9 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
  * Например, 100 рублей под 10% годовых превратятся в 133.1 рубля
  */
 fun accountInThreeYears(initial: Int, percent: Int): Double {
-    val firstYear = initial + (percent % initial)
-    val secondYear = firstYear + (percent % firstYear)
-    val result = secondYear + (percent % secondYear)
-    return result.toDouble()
+    val a = 1 + percent.toDouble() / 100
+    val years = 3
+    return ( initial.toDouble() * Math.pow(a, years.toDouble()) )
 }
 
 /**
