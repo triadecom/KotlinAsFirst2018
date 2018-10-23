@@ -58,9 +58,7 @@ fun main(args: Array<String>) {
  * Пользователь задает время в часах, минутах и секундах, например, 8:20:35.
  * Рассчитать время в секундах, прошедшее с начала суток (30035 в данном случае).
  */
-fun seconds(hours: Int, minutes: Int, seconds: Int): Int {
-    return (hours * 3600 + minutes * 60 + seconds)
-}
+fun seconds(hours: Int, minutes: Int, seconds: Int): Int = (hours * 3600 + minutes * 60 + seconds)
 
 /**
  * Тривиальная
@@ -107,9 +105,8 @@ fun trackLength(x1: Double, y1: Double, x2: Double, y2: Double): Double {
  * Пользователь задает целое число, большее 100 (например, 3801).
  * Определить третью цифру справа в этом числе (в данном случае 8).
  */
-fun thirdDigit(number: Int): Int {
-    return number % 1000 / 100
-}
+fun thirdDigit(number: Int): Int = number % 1000 / 100
+
 
 /**
  * Простая
@@ -118,9 +115,9 @@ fun thirdDigit(number: Int): Int {
  * прибыл на станцию назначения в h2 часов m2 минут того же дня (например в 13:01).
  * Определите время поезда в пути в минутах (в данном случае 216).
  */
-fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int {
-    return (hoursArrive - hoursDepart) * 60 - minutesDepart + minutesArrive
-}
+fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minutesArrive: Int): Int =
+        (hoursArrive - hoursDepart) * 60 - minutesDepart + minutesArrive
+
 
 /**
  * Простая
@@ -132,7 +129,7 @@ fun travelMinutes(hoursDepart: Int, minutesDepart: Int, hoursArrive: Int, minute
 fun accountInThreeYears(initial: Int, percent: Int): Double {
     val a = 1 + percent.toDouble() / 100
     val years = 3
-    return ( initial.toDouble() * Math.pow(a, years.toDouble()) )
+    return (initial.toDouble() * Math.pow(a, years.toDouble()))
 }
 
 /**
@@ -145,6 +142,5 @@ fun numberRevert(number: Int): Int {
     val first = number / 100
     val second = number / 10 - first * 10
     val third = number - (first * 100 + second * 10)
-    val result = third * 100 + second * 10 + first
-    return result
+    return (third * 100 + second * 10 + first)
 }
