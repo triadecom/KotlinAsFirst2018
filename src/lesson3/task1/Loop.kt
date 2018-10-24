@@ -70,15 +70,14 @@ fun digitCountInNumber(n: Int, m: Int): Int =
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun digitNumber(n: Int): Int {
-    var x = n;
-    var result = 0;
+    var x = n
+    var result = 0
     do {
-        result++;
-        x/=10;
+        result++
+        x /= 10
     } while (x != 0)
 
-
-return result;
+    return result
 }
 
 /**
@@ -88,8 +87,19 @@ return result;
  * Ряд Фибоначчи определён следующим образом: fib(1) = 1, fib(2) = 1, fib(n+2) = fib(n) + fib(n+1)
  */
 fun fib(n: Int): Int {
-    if (n == 1 || n == 2) return 1
-    return fib(n-1) + fib(n-2)
+
+    var n1 = 1
+    var n2 = 1
+    var n3 = 1
+    for (i in 3..n) {
+        n3 = n1 + n2
+        n1 = n2
+        n2 = n3
+    }
+    return n3
+
+    /* if (n == 1 || n == 2) return 1
+    return fib(n-1) + fib(n-2) */
 }
 
 /**
@@ -99,11 +109,11 @@ fun fib(n: Int): Int {
  * минимальное число k, которое делится и на m и на n без остатка
  */
 fun lcm(m: Int, n: Int): Int {
-    var greater_num = max(m,n)
-    var d = greater_num
-    while (!(greater_num.rem(m) == 0 && greater_num.rem(n) == 0))
-        greater_num += d
-    return greater_num
+    var greaterNum = max(m, n)
+    var d = greaterNum
+    while (!(greaterNum % m == 0 && greaterNum % n == 0))
+        greaterNum += d
+    return greaterNum
 }
 
 /**
@@ -123,12 +133,7 @@ fun minDivisor(n: Int): Int {
  *
  * Для заданного числа n > 1 найти максимальный делитель, меньший n
  */
-fun maxDivisor(n: Int): Int {
-    for (i in n-1..1) {
-        if (n.rem(i) == 0) return i
-    }
-    return 1
-}
+fun maxDivisor(n: Int): Int = n / minDivisor(n)
 
 /**
  * Простая
@@ -138,11 +143,11 @@ fun maxDivisor(n: Int): Int {
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    var greater_one = max(m,n)
-    var lesser_one = min(m,n)
-    for (i in 2..lesser_one+1) {
-        if (lesser_one.rem(i) == 0)
-            if (greater_one.rem(i) == 0) return false
+    var greaterOne = max(m, n)
+    var lesserOne = min(m, n)
+    for (i in 2..lesserOne + 1) {
+        if (lesserOne % i == 0)
+            if (greaterOne % i == 0) return false
     }
     return true
 }
@@ -155,7 +160,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
 fun squareBetweenExists(m: Int, n: Int): Boolean {
-    for (i in m..n+1) {
+    for (i in m..n + 1) {
         if (sqrt(i.toDouble()) == truncate(sqrt(i.toDouble())))
             return true
     }
@@ -199,7 +204,7 @@ fun collatzSteps(x: Int): Int {
  * sin(x) = x - x^3 / 3! + x^5 / 5! - x^7 / 7! + ...
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
-fun sin(x: Double, eps: Double): Double = TODO()
+fun sin(x: Double, eps: Double): Double  = TODO()
 
 /**
  * Средняя
@@ -219,10 +224,10 @@ fun cos(x: Double, eps: Double): Double = TODO()
  */
 fun revert(n: Int): Int {
     var m = n
-    var result = 0;
-    while (m != 0){
-        result = result * 10 + (m % 10);
-        m/=10
+    var result = 0
+    while (m != 0) {
+        result = result * 10 + (m % 10)
+        m /= 10
 
     }
     return result
@@ -328,23 +333,4 @@ fun fibSequenceDigit(n: Int): Int {
         len = len + len(res)
         i++
     }
-}
-
-
-fun main(args: Array<String>) {
-    println(digitNumber(1000))
-    println(fib(10))
-    println(lcm(3, 4))
-    println(minDivisor(7))
-    println(maxDivisor(7))
-    println(isCoPrime(25, 49))
-    println(squareBetweenExists(26, 29))
-    println(collatzSteps(15))
-    println(sin(1.77, 0.00001))
-    println(cos(1.77, 0.00001))
-    println(revert(123456))
-    println(isPalindrome(123321))
-    println(hasDifferentDigits(11211))
-    for (i in 1..10)
-        println(fibSequenceDigit(i))
 }
