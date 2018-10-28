@@ -246,10 +246,13 @@ fun convert(n: Int, base: Int): List<Int> {
     var result = mutableListOf<Int>()
     var a = n
 
-    while (a != 0) {
+    do {
         result.add(a % base)
         a /= base
-    }
+    } while (a != 0)
+
+    if (result.toString() == "") result.add(0)
+
     return result.reversed()
 }
 
@@ -265,6 +268,10 @@ fun convertToString(n: Int, base: Int): String {
     var result = ""
     var a = n
     var rem = 0
+
+    if (n == 0) {
+        return "0"
+    }
 
     while (a != 0) {
         rem = a % base
@@ -283,11 +290,9 @@ fun convertToString(n: Int, base: Int): String {
  * Например: digits = (1, 3, 12), base = 14 -> 250
  */
 fun decimal(digits: List<Int>, base: Int): Int {
-    var a = 0.0
     var result = 0
-    for (element in digits.reversed()) {
-        result += (element * pow(a, base.toDouble())).toInt()
-        a++
+    for (element in digits) {
+        result = element + result * base
     }
     return result
 }
@@ -357,7 +362,7 @@ val charsetHundreds = listOf(
         "девятьсот")            // charsetHundreds[8]
 
 val charsetDecSimple = listOf(
-        "одинадцать",           // charsetDecSimple[0]
+        "одиннадцать",           // charsetDecSimple[0]
         "двенадцать",           // charsetDecSimple[1]
         "тринадцать",           // charsetDecSimple[2]
         "четырнадцать",         // charsetDecSimple[3]
@@ -456,10 +461,14 @@ fun thousandCheck(n: Int): String {
         digit.size == 5 -> num = 1
         digit.size == 4 -> num = 0
     }
+
+    if ((num == 1) && (digit[0] == 1)) return charsetExeptions[1]
+    if ((num == 2) && (digit[1] == 1)) return charsetExeptions[1]
+
     return when {
         digit[num] == 0 -> charsetExeptions[1]
         digit[num] == 1 -> charsetExeptions[0]
-        ((digit[num] > 1) && (digit[num] < 5) && (digit[0] != 1)) -> charsetExeptions[2]
+        ((digit[num] > 1) && (digit[num] < 5)) -> charsetExeptions[2]
         else -> charsetExeptions[1]
     }
 }
