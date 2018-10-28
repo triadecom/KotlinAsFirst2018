@@ -1,4 +1,4 @@
-@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
+@file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence", "UNREACHABLE_CODE")
 
 package lesson4.task1
 
@@ -382,7 +382,9 @@ val charsetExeptions = listOf(
 */
 
 
-fun numberDefine(n: Int): List<Int> {      // Функция, разбивающая целое число на её составляющие
+// Функция, разбивающая целое число на её составляющие, занося в список
+
+fun numberDefine(n: Int): List<Int> {
     val digit = mutableListOf<Int>()
     var a = 10
     var b = 1
@@ -396,86 +398,108 @@ fun numberDefine(n: Int): List<Int> {      // Функция, разбивающ
     return digit.reversed()
 }
 
+// Функция, записывающая двухзначные числа по-русски
 
-fun triadeDefine(n: Int, hundred: Boolean): String {
+fun pairDefine(n: Int): String {
     var digit = listOf<Int>()
-    digit = numberDefine(n)
     var charResult = mutableListOf<String>()
-    for (i in 0 until 10) if (digit[0] == i) charResult.add(charsetHundreds[i - 1])
-    if (digit[1] == 1) for (i in 0 until 10) if (digit[2] == i) charResult.add(charsetDecSimple[i - 1])
-    for (i in 0 until 10) if (digit[1] == i) charResult.add(charsetDec[i - 1])
-    if ((hundred == true) && (digit[2] == 1)) charResult.add(charsetExeptions[3])
-    for (i in 0 until 10) if ((digit[2] == i) && digit[2] > 1) charResult.add(charsetSimple[i])
+    digit = numberDefine(n)
 
+    if (digit[0] == 1)
+        for (i in 1 until 10) if ((digit[1] == i)) return charsetDecSimple[i - 1]
+    for (i in 1 until 10) if ((digit[0] == i) && (digit[0] != 1)) charResult.add(charsetDec[i - 1])
+    if (digit.size == 5) {
+        if (digit[1] == 1) charResult.add(charsetExeptions[3])
+        if (digit[1] == 2) charResult.add(charsetExeptions[4])
+        for (i in 3 until 10) if ((digit[1] == i) && (digit[1] != 0)) charResult.add(charsetSimple[i])
+    } else for (i in 1 until 10) if ((digit[1] == i) && (digit[1] != 0)) charResult.add(charsetSimple[i])
     return charResult.joinToString(separator = " ")
 }
 
 
+// Функция, записывающая трехзначные числа прописью по-русски.
+// Входные данные: n<Int> - само число
+// pos - отвечает за расположение трехзначного числа, его значения могут быть:
+// 0 - шестизначное число, где необходимое трехзначное число стоит вначале и является тысячей
+// 1 - шестизначное число, где необходимое трехначное число стоит в конце и не является тысячей
+
+
+fun triadeDefine(n: Int, pos: Int): String {
+    val digit = numberDefine(n)
+    val result = mutableListOf<String>()
+    var num = 0
+    if (pos == 1) num = 3
+    if (digit.size == 4) num = 1
+    if (digit.size == 5) num = 2
+
+    for (i in 1 until 10) if (digit[num] == i) result.add(charsetHundreds[i - 1])
+
+    if (digit[num + 1] == 1)
+        for (i in 1 until 10) if ((digit[num + 2] == i)) result.add(charsetDecSimple[i - 1])
+
+    for (i in 2 until 10) if (digit[num + 1] == i) result.add(charsetDec[i - 1])
+
+    if ((digit.size == 6) && (pos == 0)) {
+        if (digit[num + 2] == 1) result.add(charsetExeptions[3])
+        if (digit[num + 2] == 2) result.add(charsetExeptions[4])
+        for (i in 3 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
+    } else for (i in 1 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
+    return result.joinToString(separator = " ")
+}
+
+
+fun thousandCheck(n: Int): String {
+    var digit = numberDefine(n)
+    var num = 0
+    when {
+        digit.size == 6 -> num = 2
+        digit.size == 5 -> num = 1
+        digit.size == 4 -> num = 0
+    }
+    return when {
+        digit[num] == 0 -> charsetExeptions[1]
+        digit[num] == 1 -> charsetExeptions[0]
+        ((digit[num] > 1) && (digit[num] < 5) && (digit[0] != 1)) -> charsetExeptions[2]
+        else -> charsetExeptions[1]
+    }
+}
+
 fun russian(n: Int): String {
     val digits = numberDefine(n)
-    val length = Math.ceil(Math.log10(n.toDouble())).toInt()
     var result = mutableListOf<String>()
-    var triade = ""
+    var tf = 0
 
-    if (length == 6) {
-        triade = digits[0].toString() + digits[1].toString() + digits[2].toString()
-        result.add(triadeDefine(triade.toInt(), true))
-
-        if (digits[2] == 1) result.add(charsetExeptions[0])
-        else if ((digits[2] > 1) && (digits[2] < 5)) result.add(charsetExeptions[2])
-        result.add(charsetExeptions[1])
-
-        triade = digits[3].toString() + digits[4].toString() + digits[5].toString()
-        result.add(triadeDefine(triade.toInt(), false))
-        return result.joinToString(separator = " ")
-
-    }
-
-    if (length == 5) {
-        for (i in 0 until 10) {
-            if ((digits[0] == 1) && (digits[1] == i)) result.add(charsetDecSimple[i - 1])
-            else if ((digits[0] == i) && (digits[0] != 1)) result.add(charsetDec[i - 1])
-           // if (digits[1] == i) result.add()
+    when {
+        digits.size == 6 -> {
+            tf = digits[3] + digits[4] + digits[5]
+            result.add(triadeDefine(n, 0))
+            result.add(thousandCheck(n))
+            if (tf > 0) result.add(triadeDefine(n, 1))
         }
-        if (digits[0] == 1) result.add(charsetExeptions[0])
-        else if ((digits[1] > 1) && (digits[1] < 5)) result.add(charsetExeptions[2])
-        result.add(charsetExeptions[1])
-        triade = digits[3].toString() + digits[4].toString() + digits[5].toString()
-        result.add(triadeDefine(triade.toInt(), false))
-        return result.joinToString(separator = " ")
-    }
 
-    if ((length == 4) && (digits[0] == 1)) result.add(charsetExeptions[0])
-    if (digits[0] == 2) result.add(charsetExeptions[4])
-    for (i in 0 until 10) {
-        if (digits[0] == 1) result.add(charsetExeptions[0])
-        if (digits[0] == 2) result.add(charsetExeptions[4])
-        if ((digits[0] == i) && (digits[0] != 1) && (digits[0] != 2)) result.add(charsetSimple[i])
+        digits.size == 5 -> {
+            tf = digits[2] + digits[3] + digits[4]
+            result.add(pairDefine(n))
+            result.add(thousandCheck(n))
+            if (tf > 0) result.add(triadeDefine(n, 0))
+        }
 
-
-    }
-    if ((digits[0] > 1) && (digits[0] < 5)) result.add(charsetExeptions[2])
-    result.add(charsetExeptions[1])
-    triade = digits[1].toString() + digits[2].toString() + digits[3].toString()
-    result.add(triadeDefine(triade.toInt(), false))
-    return result.joinToString(separator = " ")
-
-
-    if (length == 3) {
-        triade = digits[0].toString() + digits[1].toString() + digits[2].toString()
-        return result.add(triadeDefine(triade.toInt(), false)).toString()
-    }
-
-    if (length == 2) {
-        for (i in 0 until 10) {
-            if ((digits[0] == 1) && (digits[1] == i)) return charsetDecSimple[i - 1]
-            for (i in 0 until 10) {
-                if (digits[0] == i) result.add(charsetDec[i - 1])
-                if ((digits[1] == i) && (digits[1] > 1)) result.add(charsetSimple[i])
-                return result.joinToString(separator = " ")
+        digits.size == 4 -> {
+            tf = digits[1] + digits[2] + digits[3]
+            when {
+                digits[0] == 1 -> result.add(charsetExeptions[3])
+                digits[0] == 2 -> result.add(charsetExeptions[4])
             }
+            for (i in 3 until 10) if (digits[0] == i) result.add(charsetSimple[i])
+            result.add(thousandCheck(n))
+            if (tf > 0) result.add(triadeDefine(n, 0))
         }
+
+        digits.size == 3 -> result.add(triadeDefine(n, 0))
+        digits.size == 2 -> result.add(pairDefine(n))
+        n < 10 -> for (i in 0 until 10) if (n == i) result.add(charsetSimple[i])
     }
-    return charsetSimple[digits[0]]
+    return result.joinToString(separator = " ")
 }
+
 
