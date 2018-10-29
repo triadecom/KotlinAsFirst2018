@@ -1,9 +1,9 @@
 @file:Suppress("UNUSED_PARAMETER")
 package lesson3.task1
 
-import kotlinx.html.MATH
+import lesson1.task1.sqr
 import kotlin.math.sqrt
-import kotlin.math.pow
+import java.lang.Math.pow
 import kotlin.math.*
 
 /**
@@ -110,7 +110,7 @@ fun fib(n: Int): Int {
  */
 fun lcm(m: Int, n: Int): Int {
     var greaterNum = max(m, n)
-    var d = greaterNum
+    val d = greaterNum
     while (!(greaterNum % m == 0 && greaterNum % n == 0))
         greaterNum += d
     return greaterNum
@@ -143,8 +143,8 @@ fun maxDivisor(n: Int): Int = n / minDivisor(n)
  * Например, 25 и 49 взаимно простые, а 6 и 8 -- нет.
  */
 fun isCoPrime(m: Int, n: Int): Boolean {
-    var greaterOne = max(m, n)
-    var lesserOne = min(m, n)
+    val greaterOne = max(m, n)
+    val lesserOne = min(m, n)
     for (i in 2..lesserOne + 1) {
         if (lesserOne % i == 0)
             if (greaterOne % i == 0) return false
@@ -159,13 +159,7 @@ fun isCoPrime(m: Int, n: Int): Boolean {
  * то есть, существует ли такое целое k, что m <= k*k <= n.
  * Например, для интервала 21..28 21 <= 5*5 <= 28, а для интервала 51..61 квадрата не существует.
  */
-fun squareBetweenExists(m: Int, n: Int): Boolean {
-    for (i in m..n + 1) {
-        if (sqrt(i.toDouble()) == truncate(sqrt(i.toDouble())))
-            return true
-    }
-    return false
-}
+fun squareBetweenExists(m: Int, n: Int): Boolean = (floor(sqrt(n.toDouble())) - ceil(sqrt(m.toDouble())) >= 0.0)
 
 
 /**
@@ -204,7 +198,20 @@ fun collatzSteps(x: Int): Int {
  * sin(x) = x - x^3 / 3! + x^5 / 5! - x^7 / 7! + ...
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
-fun sin(x: Double, eps: Double): Double  = TODO()
+fun sin(x: Double, eps: Double): Double {
+    var a = 1
+    val digX = x % (PI * 2)
+    var n = digX
+    var result = digX
+
+    while (abs(n) >= eps) {
+        n *= -digX * digX / (a + 1) / (a + 2)
+        a += 2
+        result += n
+    }
+
+    return result
+}
 
 /**
  * Средняя
@@ -213,7 +220,7 @@ fun sin(x: Double, eps: Double): Double  = TODO()
  * cos(x) = 1 - x^2 / 2! + x^4 / 4! - x^6 / 6! + ...
  * Нужную точность считать достигнутой, если очередной член ряда меньше eps по модулю
  */
-fun cos(x: Double, eps: Double): Double = TODO()
+fun cos(x: Double, eps: Double): Double = sin((PI / 2 + x), eps)
 
 /**
  * Средняя
@@ -242,7 +249,7 @@ fun revert(n: Int): Int {
  *
  * Использовать операции со строками в этой задаче запрещается.
  */
-fun isPalindrome(n: Int): Boolean = n == revert(n);
+fun isPalindrome(n: Int): Boolean = n == revert(n)
 
 
 
@@ -257,12 +264,12 @@ fun isPalindrome(n: Int): Boolean = n == revert(n);
 fun hasDifferentDigits(n: Int): Boolean {
     if (n < 10) return false
     var nn = n
-    var prev_dig = nn.rem(10)
+    var prevDig = nn.rem(10)
     nn = nn.div(10)
     while (nn > 0) {
-        if (nn.rem(10) != prev_dig)
+        if (nn.rem(10) != prevDig)
             return true
-        prev_dig = nn.rem(10)
+        prevDig = nn.rem(10)
         nn = nn.div(10)
     }
     return false
@@ -278,32 +285,18 @@ fun hasDifferentDigits(n: Int): Boolean {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun squareSequenceDigit(n: Int): Int {
-    var len = 0;
-    var i = 1;
-    var m = n;
-    while (true) {
-        var res = i * i
-        if (len + len(res) >= m) {
-            var ans = revert(res);
+    if (n == 1) return 1
+    var sum = 1
+    var square = 1
+    var digit = 1
 
-            while (len + 1 < m) {
-                ans = ans.div(10);
-                len++;
-            }
-            return ans.rem(10);
-        }
-        len = len + len(res)
-        i++
+    while (sum < n) {
+        digit++
+        square = sqr(digit)
+        var numberOfDigits = digitNumber(square)
+        sum += numberOfDigits
     }
-}
-fun len(n: Int): Int {
-    var m = n;
-    var res = 0;
-    while (m > 0) {
-        m = m.div(10);
-        res++;
-    }
-    return res;
+    return square / pow(10.0, (sum - n).toDouble()).toInt() % 10
 }
 
 /**
@@ -316,21 +309,26 @@ fun len(n: Int): Int {
  * Использовать операции со строками в этой задаче запрещается.
  */
 fun fibSequenceDigit(n: Int): Int {
-    var len = 0;
-    var i = 1;
-    var m = n;
-    while (true) {
-        var res = fib(i)
-        if (len + len(res) >= m) {
-            var ans = revert(res);
+    if (n == 1) return 1
+    var sum = 1
+    var digit = 1
+    var fib = 1
 
-            while (len + 1 < m) {
-                ans = ans.div(10);
-                len++;
-            }
-            return ans.rem(10);
-        }
-        len = len + len(res)
-        i++
+    while (sum < n) {
+        digit++
+        fib = fib(digit)
+        var numberOfDigits = digitNumber(fib)
+        sum += numberOfDigits
     }
+    return fib / pow(10.0, (sum - n).toDouble()).toInt() % 10
+}
+
+fun len(n: Int): Int {
+    var m = n
+    var res = 0
+    while (m > 0) {
+        m = m.div(10)
+        res++
+    }
+    return res
 }
