@@ -3,7 +3,6 @@
 package lesson4.task1
 
 import lesson1.task1.discriminant
-import lesson3.task1.len
 import kotlin.math.sqrt
 import java.lang.Math.pow
 
@@ -291,8 +290,8 @@ fun convertToString(n: Int, base: Int): String {
  */
 fun decimal(digits: List<Int>, base: Int): Int {
     var result = 0
-    for (element in digits) {
-        result = element + result * base
+    for (i in digits) {
+        result = i + result * base
     }
     return result
 }
@@ -306,7 +305,12 @@ fun decimal(digits: List<Int>, base: Int): Int {
  * 10 -> a, 11 -> b, 12 -> c и так далее.
  * Например: str = "13c", base = 14 -> 250
  */
-fun decimalFromString(str: String, base: Int): Int = TODO()
+
+fun decimalFromString(str: String, base: Int): Int =
+        decimal(str.map {
+            if (it.isDigit()) (it - '0')
+            else (it - 'a' + 10)
+        }, base)
 
 /**
  * Сложная
@@ -316,7 +320,36 @@ fun decimalFromString(str: String, base: Int): Int = TODO()
  * 90 = XC, 100 = C, 400 = CD, 500 = D, 900 = CM, 1000 = M.
  * Например: 23 = XXIII, 44 = XLIV, 100 =
  */
-fun roman(n: Int): String = TODO()
+fun roman(n: Int): String {
+    val digits = listOf(
+            1,                // digits[0]
+            4,                // digits[1]
+            5,                // digits[2]
+            9,                // digits[3]
+            10,               // digits[4]
+            40,               // digits[5]
+            50,               // digits[6]
+            90,               // digits[7]
+            100,              // digits[8]
+            400,              // digits[9]
+            500,              // digits[10]
+            900,              // digits[11]
+            1000              // digits[12]
+    )
+
+    var result = ""
+    var a = n
+    while (a / 1000 > 0) {
+        a -= digits[12]
+        result += charsetRoman[12]
+    }
+    while (a > 0) for (i in 0 until digits.size) if (a < digits[i]) {
+        a -= digits[i - 1]
+        result += charsetRoman[i - 1]
+        break
+    }
+    return result
+}
 
 /**
  * Очень сложная
@@ -326,6 +359,21 @@ fun roman(n: Int): String = TODO()
  * 23964 = "двадцать три тысячи девятьсот шестьдесят четыре"
  */
 
+val charsetRoman = listOf(
+        "I",              // charsetRoman[0]
+        "IV",             // charsetRoman[1]
+        "V",              // charsetRoman[2]
+        "IX",             // charsetRoman[3]
+        "X",              // charsetRoman[4]
+        "XL",             // charsetRoman[5]
+        "L",              // charsetRoman[6]
+        "XC",             // charsetRoman[7]
+        "C",              // charsetRoman[8]
+        "CD",             // charsetRoman[9]
+        "D",              // charsetRoman[10]
+        "CM",             // charsetRoman[11]
+        "M"               // charsetRoman[12]
+)
 
 val charsetSimple = listOf(
         "ноль",                 // charsetSimple[0]
@@ -410,6 +458,7 @@ fun pairDefine(n: Int): String {
     var charResult = mutableListOf<String>()
     digit = numberDefine(n)
 
+    if ((n == 10) || ((digit[0] + digit[1]) == 1)) return charsetDec[0]
     if (digit[0] == 1)
         for (i in 1 until 10) if ((digit[1] == i)) return charsetDecSimple[i - 1]
     for (i in 1 until 10) if ((digit[0] == i) && (digit[0] != 1)) charResult.add(charsetDec[i - 1])
@@ -441,6 +490,7 @@ fun triadeDefine(n: Int, pos: Int): String {
 
     if (digit[num + 1] == 1)
         for (i in 1 until 10) if ((digit[num + 2] == i)) result.add(charsetDecSimple[i - 1])
+    if ((digit[num + 2] == 0) && digit[num + 1] == 1) result.add(charsetDec[0])
 
     for (i in 2 until 10) if (digit[num + 1] == i) result.add(charsetDec[i - 1])
 
@@ -505,8 +555,10 @@ fun russian(n: Int): String {
         }
 
         digits.size == 3 -> result.add(triadeDefine(n, 0))
-        digits.size == 2 -> result.add(pairDefine(n))
+        digits.size == 2 -> return pairDefine(n)
+        n == 10 -> return charsetDec[0]
         n < 10 -> for (i in 0 until 10) if (n == i) result.add(charsetSimple[i])
+
     }
     return result.joinToString(separator = " ")
 }
