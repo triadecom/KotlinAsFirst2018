@@ -293,8 +293,7 @@ fun squareSequenceDigit(n: Int): Int {
     while (sum < n) {
         digit++
         square = sqr(digit)
-        var numberOfDigits = digitNumber(square)
-        sum += numberOfDigits
+        sum += digitNumber(square)
     }
     return square / pow(10.0, (sum - n).toDouble()).toInt() % 10
 }
@@ -317,18 +316,7 @@ fun fibSequenceDigit(n: Int): Int {
     while (sum < n) {
         digit++
         fib = fib(digit)
-        var numberOfDigits = digitNumber(fib)
-        sum += numberOfDigits
+        sum += digitNumber(fib)
     }
     return fib / pow(10.0, (sum - n).toDouble()).toInt() % 10
-}
-
-fun len(n: Int): Int {
-    var m = n
-    var res = 0
-    while (m > 0) {
-        m = m.div(10)
-        res++
-    }
-    return res
 }
