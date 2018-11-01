@@ -495,8 +495,8 @@ fun triadeDefine(n: Int, pos: Int): String {
     for (i in 2 until 10) if (digit[num + 1] == i) result.add(charsetDec[i - 1])
 
     if ((digit.size == 6) && (pos == 0)) {
-        if (digit[num + 2] == 1) result.add(charsetExeptions[3])
-        if (digit[num + 2] == 2) result.add(charsetExeptions[4])
+        if ((digit[num + 2] == 1) && (digit[num + 1] != 1)) result.add(charsetExeptions[3])
+        if ((digit[num + 2] == 2) && (digit[num + 1] != 1)) result.add(charsetExeptions[4])
         for (i in 3 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
     } else for (i in 1 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
     return result.joinToString(separator = " ")
