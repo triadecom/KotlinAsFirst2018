@@ -67,11 +67,10 @@ fun minBiRoot(a: Double, b: Double, c: Double): Double {
  * вернуть строку вида: «21 год», «32 года», «12 лет».
  */
 fun ageDescription(age: Int): String {
-    if (age % 10 == 1 && age % 100 != 11) return "$age год"
+    return if (age % 10 == 1 && age % 100 != 11) "$age год"
     else if ((age % 10 == 2 || age % 10 == 3 || age % 10 == 4) &&
-            !(age % 100 == 12 || age % 100 == 13 || age % 100 == 14)) return "$age года"
-    return "$age лет"
-
+            !(age % 100 == 12 || age % 100 == 13 || age % 100 == 14)) "$age года"
+    else "$age лет"
 }
 
 /**
@@ -113,13 +112,9 @@ fun timeForHalfWay(t1: Double, v1: Double,
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
                        rookX2: Int, rookY2: Int): Int {
-    if ((kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2))
-        return 3 else
-        if (kingX == rookX1 || kingY == rookY1)
-            return 1 else
-            if ((kingX == rookX2 || kingY == rookY2))
-                return 2
-    return 0
+    return if ((kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2)) 3
+    else if (kingX == rookX1 || kingY == rookY1) 1
+    else if ((kingX == rookX2 || kingY == rookY2)) 2 else 0
 }
 
 /**
@@ -135,13 +130,9 @@ fun whichRookThreatens(kingX: Int, kingY: Int,
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
                           bishopX: Int, bishopY: Int): Int {
-    if ((kingX == rookX || kingY == rookY) && (abs(kingX - bishopX) == abs(kingY - bishopY)))
-        return 3 else
-        if (kingX == rookX || kingY == rookY)
-            return 1 else
-            if (abs(kingX - bishopX) == abs(kingY - bishopY))
-                return 2
-    return 0
+    return if ((kingX == rookX || kingY == rookY) && (abs(kingX - bishopX) == abs(kingY - bishopY))) 3
+    else if (kingX == rookX || kingY == rookY) 1
+    else if (abs(kingX - bishopX) == abs(kingY - bishopY)) 2 else 0
 }
 
 /**
@@ -159,11 +150,9 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
     val c2 = (a + b + c) - (h + c1)
     val cos = (sqr(c1) + sqr(c2) - sqr(h)) / (2 * c1 * c2)
 
-    if ((cos > 0.0) && (cos < 1.0)) return 0
-    else if (cos == 0.0) return 1
-    else if ((cos < 0.0) && (cos > -1.0)) return 2
-    return -1
-
+    return if ((cos > 0.0) && (cos < 1.0)) 0
+    else if (cos == 0.0) 1
+    else if ((cos < 0.0) && (cos > -1.0)) 2 else -1
 }
 
 /**
@@ -176,8 +165,7 @@ fun triangleKind(a: Double, b: Double, c: Double): Int {
  */
 fun segmentLength(a: Int, b: Int, c: Int, d: Int): Int {
     val len = min(b, d) - max(a, c)
-    if (len < 0) return -1
-    return len
+    return if (len < 0) -1 else len
 }
 
 
