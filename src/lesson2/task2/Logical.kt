@@ -1,4 +1,5 @@
 @file:Suppress("UNUSED_PARAMETER")
+
 package lesson2.task2
 
 import lesson1.task1.sqr
@@ -19,14 +20,12 @@ fun pointInsideCircle(x: Double, y: Double, x0: Double, y0: Double, r: Double) =
  * Четырехзначное число назовем счастливым, если сумма первых двух ее цифр равна сумме двух последних.
  * Определить, счастливое ли заданное число, вернуть true, если это так.
  */
-fun isNumberHappy(number: Int): Boolean  {
+fun isNumberHappy(number: Int): Boolean {
 
     val firstSum = number / 1000 + number % 1000 / 100
     val lastSum = number % 100 / 10 + number % 10
 
-    if (firstSum == lastSum) return true
-    return false
-
+    return firstSum == lastSum
 }
 
 /**
@@ -47,12 +46,9 @@ fun queenThreatens(x1: Int, y1: Int, x2: Int, y2: Int): Boolean = abs(x1 - x2) =
  */
 fun daysInMonth(month: Int, year: Int): Int {
 
-   if (((month + month / 8) % 2 == 0) && (month != 2)) return 30
-   else if (month == 2) {
-       if ((year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0) && (month == 2)) return 29
-       return 28
-   }
-    return 31
+    return if (((month + month / 8) % 2 == 0) && (month != 2)) 30
+    else if (month == 2) if ((year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0) && (month == 2)) 29 else 28
+    else 31
 }
 
 
