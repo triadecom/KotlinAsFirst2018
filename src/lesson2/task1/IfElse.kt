@@ -109,7 +109,8 @@ fun timeForHalfWay(t1: Double, v1: Double,
  */
 fun whichRookThreatens(kingX: Int, kingY: Int,
                        rookX1: Int, rookY1: Int,
-                       rookX2: Int, rookY2: Int): Int = if ((kingX == rookX1 || kingY == rookY1) && (kingX == rookX2 || kingY == rookY2)) 3
+                       rookX2: Int, rookY2: Int): Int = if ((kingX == rookX1 || kingY == rookY1) &&
+        (kingX == rookX2 || kingY == rookY2)) 3
 else if (kingX == rookX1 || kingY == rookY1) 1
 else if ((kingX == rookX2 || kingY == rookY2)) 2 else 0
 
@@ -126,7 +127,8 @@ else if ((kingX == rookX2 || kingY == rookY2)) 2 else 0
  */
 fun rookOrBishopThreatens(kingX: Int, kingY: Int,
                           rookX: Int, rookY: Int,
-                          bishopX: Int, bishopY: Int): Int = if ((kingX == rookX || kingY == rookY) && (abs(kingX - bishopX) == abs(kingY - bishopY))) 3
+                          bishopX: Int, bishopY: Int): Int = if ((kingX == rookX || kingY == rookY) &&
+        (abs(kingX - bishopX) == abs(kingY - bishopY))) 3
 else if (kingX == rookX || kingY == rookY) 1
 else if (abs(kingX - bishopX) == abs(kingY - bishopY)) 2 else 0
 
