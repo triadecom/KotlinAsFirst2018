@@ -5,6 +5,7 @@ package lesson4.task1
 import lesson1.task1.discriminant
 import kotlin.math.sqrt
 import java.lang.Math.pow
+import lesson3.task1.digitNumber
 
 /**
  * Пример
@@ -118,10 +119,9 @@ fun buildSumExample(list: List<Int>) = list.joinToString(separator = " + ", post
  */
 fun abs(v: List<Double>): Double {
     var mod = 0.0
-    if (v.size > 0) {
-        for (i in 0 until v.size) {
+    if (v.isNotEmpty()) {
+        for (i in 0 until v.size)
             mod += v[i] * v[i]
-        }
     }
     return sqrt(mod)
 }
@@ -207,7 +207,7 @@ fun accumulate(list: MutableList<Double>): MutableList<Double> {
  * Множители в списке должны располагаться по возрастанию.
  */
 fun factorize(n: Int): List<Int> {
-    var result = mutableListOf<Int>()
+    val result = mutableListOf<Int>()
     var a = 2
     var num = n
 
@@ -242,7 +242,7 @@ fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*
  * например: n = 100, base = 4 -> (1, 2, 1, 0) или n = 250, base = 14 -> (1, 3, 12)
  */
 fun convert(n: Int, base: Int): List<Int> {
-    var result = mutableListOf<Int>()
+    val result = mutableListOf<Int>()
     var a = n
 
     do {
@@ -265,19 +265,14 @@ fun convert(n: Int, base: Int): List<Int> {
  */
 fun convertToString(n: Int, base: Int): String {
     var result = ""
-    var a = n
-    var rem = 0
-
-    if (n == 0) {
-        return "0"
+    val converted = convert(n, base)
+    var rem: Int
+    for (num in converted) {
+        rem = num % base
+        if (num < 10) result += num
+        else result += ('a' + (rem - 10))
     }
-
-    while (a != 0) {
-        rem = a % base
-        result += if (rem < 10) rem.toString() else ('a' + (rem - 10))
-        a /= base
-    }
-    return result.reversed()
+    return result
 }
 
 
@@ -337,18 +332,20 @@ fun roman(n: Int): String {
             1000              // digits[12]
     )
 
-    var result = ""
+    val result = mutableListOf<String>()
     var a = n
     while (a / 1000 > 0) {
-        a -= digits[12]
-        result += charsetRoman[12]
+        a -= 1000
+        result.add(charsetRoman[12])
     }
-    while (a > 0) for (i in 0 until digits.size) if (a < digits[i]) {
-        a -= digits[i - 1]
-        result += charsetRoman[i - 1]
-        break
-    }
-    return result
+    while (a > 0)
+        for (i in 0 until digits.size)
+            if (a < digits[i]) {
+                a -= digits[i - 1]
+                result.add(charsetRoman[i - 1])
+                break
+            }
+    return result.joinToString(separator = "")
 }
 
 /**
@@ -420,18 +417,18 @@ val charsetDecSimple = listOf(
         "восемнадцать",         // charsetDecSimple[7]
         "девятнадцать")         // charsetDecSimple[8]
 
-val charsetExeptions = listOf(
-        "тысяча",               // charsetExeptions[0]
-        "тысяч",                // charsetExeptions[1]
-        "тысячи",               // charsetExeptions[2]
-        "одна",                 // charsetExeptions[3]
-        "две")                  // charsetExeptions[4]
+val charsetExceptions = listOf(
+        "тысяча",               // charsetExceptions[0]
+        "тысяч",                // charsetExceptions[1]
+        "тысячи",               // charsetExceptions[2]
+        "одна",                 // charsetExceptions[3]
+        "две")                  // charsetExceptions[4]
 
 /*
 Простые числа - список charsetSimple[0..9]
 десятки, начиная от Десяти - список charsetDec[0..8]
 сотни, начиная ста - список charsetHundreds[0..8]
-Исключения - список charsetExeptions[0..4]
+Исключения - список charsetExceptions[0..4]
 */
 
 
@@ -441,9 +438,16 @@ fun numberDefine(n: Int): List<Int> {
     val digit = mutableListOf<Int>()
     var a = 10
     var b = 1
+    var c = 1
 
-
-    for (i in 0 until Math.ceil(Math.log10(n.toDouble())).toInt()) {
+    if (pow(10.0, (digitNumber(n) - 1).toDouble()).toInt() == n) {
+        digit.add(1)
+        do {
+            c *= 10
+            digit.add(0)
+        } while (c != n)
+        return digit
+    } else for (i in 0 until Math.ceil(Math.log10(n.toDouble())).toInt()) {
         digit.add(n % a / b)
         a *= 10
         b *= 10
@@ -451,60 +455,48 @@ fun numberDefine(n: Int): List<Int> {
     return digit.reversed()
 }
 
-// Функция, записывающая двухзначные числа по-русски
-
-fun pairDefine(n: Int): String {
-    var digit = listOf<Int>()
-    var charResult = mutableListOf<String>()
-    digit = numberDefine(n)
-
-    if ((n == 10) || ((digit[0] + digit[1]) == 1)) return charsetDec[0]
-    if (digit[0] == 1)
-        for (i in 1 until 10) if ((digit[1] == i)) return charsetDecSimple[i - 1]
-    for (i in 1 until 10) if ((digit[0] == i) && (digit[0] != 1)) charResult.add(charsetDec[i - 1])
-    if (digit.size == 5) {
-        if (digit[1] == 1) charResult.add(charsetExeptions[3])
-        if (digit[1] == 2) charResult.add(charsetExeptions[4])
-        for (i in 3 until 10) if ((digit[1] == i) && (digit[1] != 0)) charResult.add(charsetSimple[i])
-    } else for (i in 1 until 10) if ((digit[1] == i) && (digit[1] != 0)) charResult.add(charsetSimple[i])
-    return charResult.joinToString(separator = " ")
-}
-
 
 // Функция, записывающая трехзначные числа прописью по-русски.
-// Входные данные: n<Int> - само число
-// pos - отвечает за расположение трехзначного числа, его значения могут быть:
-// 0 - шестизначное число, где необходимое трехзначное число стоит вначале и является тысячей
-// 1 - шестизначное число, где необходимое трехначное число стоит в конце и не является тысячей
 
-
-fun triadeDefine(n: Int, pos: Int): String {
-    val digit = numberDefine(n)
+fun triadeDefine(n: Int, pos: Boolean): String {
     val result = mutableListOf<String>()
-    var num = 0
-    if (pos == 1) num = 3
-    if (digit.size == 4) num = 1
-    if (digit.size == 5) num = 2
+    var triade = listOf<Int>()
 
-    for (i in 1 until 10) if (digit[num] == i) result.add(charsetHundreds[i - 1])
+    // преборазуем число n в необходимую нам триаду
+    // pos - указывает на часть триады, где значения:
+    // true - нужная триада является тысячей
+    // false - нужная триада не является тысячей
 
-    if (digit[num + 1] == 1)
-        for (i in 1 until 10) if ((digit[num + 2] == i)) result.add(charsetDecSimple[i - 1])
-    if ((digit[num + 2] == 0) && digit[num + 1] == 1) result.add(charsetDec[0])
+    val digit = if (pos) n / 1000 else n % 1000
 
-    for (i in 2 until 10) if (digit[num + 1] == i) result.add(charsetDec[i - 1])
+    when {
+        digit > 99 -> triade = numberDefine(digit)
+        digit > 9 -> triade = listOf(0) + numberDefine(digit)
+        digit > 0 -> triade = listOf(0, 0) + digit
+        digit == 0 -> return ""
+    }
 
-    if ((digit.size == 6) && (pos == 0)) {
-        if ((digit[num + 2] == 1) && (digit[num + 1] != 1)) result.add(charsetExeptions[3])
-        if ((digit[num + 2] == 2) && (digit[num + 1] != 1)) result.add(charsetExeptions[4])
-        for (i in 3 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
-    } else for (i in 1 until 10) if ((digit[num + 2] == i) && (digit[num + 1] != 1)) result.add(charsetSimple[i])
+    for (i in 1 until 10) if (triade[0] == i) result.add(charsetHundreds[i - 1])
+
+    if (triade[1] == 1) {
+        if (triade[2] == 0) result.add(charsetDec[0])
+        for (i in 1 until 10) if ((triade[2] == i)) result.add(charsetDecSimple[i - 1])
+    }
+
+    for (i in 2 until 10) if (triade[1] == i) result.add(charsetDec[i - 1])
+
+    if (pos) {
+        if ((triade[2] == 1) && (triade[1] != 1)) result.add(charsetExceptions[3])
+        if ((triade[2] == 2) && (triade[1] != 1)) result.add(charsetExceptions[4])
+        for (i in 3 until 10) if ((triade[2] == i) && (triade[1] != 1)) result.add(charsetSimple[i])
+    } else for (i in 1 until 10) if ((triade[2] == i) && (triade[1] != 1)) result.add(charsetSimple[i])
+
     return result.joinToString(separator = " ")
 }
 
 
 fun thousandCheck(n: Int): String {
-    var digit = numberDefine(n)
+    val digit = numberDefine(n)
     var num = 0
     when {
         digit.size == 6 -> num = 2
@@ -512,55 +504,30 @@ fun thousandCheck(n: Int): String {
         digit.size == 4 -> num = 0
     }
 
-    if ((num == 1) && (digit[0] == 1)) return charsetExeptions[1]
-    if ((num == 2) && (digit[1] == 1)) return charsetExeptions[1]
+    if ((num == 1) && (digit[0] == 1)) return charsetExceptions[1]
+    if ((num == 2) && (digit[1] == 1)) return charsetExceptions[1]
 
     return when {
-        digit[num] == 0 -> charsetExeptions[1]
-        digit[num] == 1 -> charsetExeptions[0]
-        ((digit[num] > 1) && (digit[num] < 5)) -> charsetExeptions[2]
-        else -> charsetExeptions[1]
+        digit[num] == 0 -> charsetExceptions[1]
+        digit[num] == 1 -> charsetExceptions[0]
+        ((digit[num] > 1) && (digit[num] < 5)) -> charsetExceptions[2]
+        else -> charsetExceptions[1]
     }
 }
 
 fun russian(n: Int): String {
-    val digits = numberDefine(n)
-    var result = mutableListOf<String>()
-    var tf = 0
+    val result = mutableListOf<String>()
 
-    when {
-        digits.size == 6 -> {
-            tf = digits[3] + digits[4] + digits[5]
-            result.add(triadeDefine(n, 0))
-            result.add(thousandCheck(n))
-            if (tf > 0) result.add(triadeDefine(n, 1))
-        }
+    if (n != 0) {
+        result.add(triadeDefine(n, true))
+        if (result.first() != "") result.add(thousandCheck(n))
+        else result.removeAt(0)
+        result.add(triadeDefine(n, false))
+        if (result.last() == "") result.removeAt(2)
 
-        digits.size == 5 -> {
-            tf = digits[2] + digits[3] + digits[4]
-            result.add(pairDefine(n))
-            result.add(thousandCheck(n))
-            if (tf > 0) result.add(triadeDefine(n, 0))
-        }
-
-        digits.size == 4 -> {
-            tf = digits[1] + digits[2] + digits[3]
-            when {
-                digits[0] == 1 -> result.add(charsetExeptions[3])
-                digits[0] == 2 -> result.add(charsetExeptions[4])
-            }
-            for (i in 3 until 10) if (digits[0] == i) result.add(charsetSimple[i])
-            result.add(thousandCheck(n))
-            if (tf > 0) result.add(triadeDefine(n, 0))
-        }
-
-        digits.size == 3 -> result.add(triadeDefine(n, 0))
-        digits.size == 2 -> return pairDefine(n)
-        n == 10 -> return charsetDec[0]
-        n < 10 -> for (i in 0 until 10) if (n == i) result.add(charsetSimple[i])
-
+        return result.joinToString(separator = " ")
     }
-    return result.joinToString(separator = " ")
+    return charsetSimple[0]
 }
 
 
