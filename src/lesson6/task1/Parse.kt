@@ -1,6 +1,7 @@
 @file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
 
 package lesson6.task1
+import lesson2.task2.daysInMonth
 
 /**
  * Пример
@@ -71,8 +72,26 @@ fun main(args: Array<String>) {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30.02.2009) считается неверными
  * входными данными.
  */
-fun dateStrToDigit(str: String): String = TODO()
 
+val monthDigit = listOf("января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября",
+        "октября", "ноября", "декабря")
+
+fun dateStrToDigit(str: String): String {
+    val date = str.split(" ").toMutableList()
+    // первым делом проверяем дату на ошибки или пустоту
+    try {
+        if ((date.size != 3) || (!monthDigit.contains(date[1].toLowerCase())) || (date[0].toInt() !in 1..31)) return ""
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+    // проверяем дату на корректность по григорианскому календарю
+    date[1] = (monthDigit.indexOf(date[1].toLowerCase()) + 1).toString()
+    if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
+    // представляем день и месяц двумя числами
+    for (i in 0..1) if (date[i].toInt() < 10) date[i] = "0" + date[i]
+
+    return date.joinToString(separator = ".")
+}
 /**
  * Средняя
  *
