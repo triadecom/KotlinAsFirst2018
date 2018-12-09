@@ -1,7 +1,10 @@
 @file:Suppress("UNUSED_PARAMETER", "ConvertCallChainIntoSequence")
 
 package lesson6.task1
+
 import lesson2.task2.daysInMonth
+import java.time.Month
+import java.time.Year
 
 /**
  * Пример
@@ -50,12 +53,10 @@ fun main(args: Array<String>) {
         val seconds = timeStrToSeconds(line)
         if (seconds == -1) {
             println("Введённая строка $line не соответствует формату ЧЧ:ММ:СС")
-        }
-        else {
+        } else {
             println("Прошло секунд с начала суток: $seconds")
         }
-    }
-    else {
+    } else {
         println("Достигнут <конец файла> в процессе чтения строки. Программа прервана")
     }
 }
@@ -92,6 +93,7 @@ fun dateStrToDigit(str: String): String {
 
     return date.joinToString(separator = ".")
 }
+
 /**
  * Средняя
  *
@@ -102,7 +104,21 @@ fun dateStrToDigit(str: String): String {
  * Обратите внимание: некорректная с точки зрения календаря дата (например, 30 февраля 2009) считается неверными
  * входными данными.
  */
-fun dateDigitToStr(digital: String): String = TODO()
+fun dateDigitToStr(digital: String): String {
+    val date = digital.split(".").toMutableList()
+    // первым делом проверяем дату на ошибки или пустоту
+    try {
+        if ((date.size != 3) || (date[0].toInt() !in 1..31) || (date[1].toInt() !in 1..12)) return ""
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+    // проверяем дату на корректность по григорианскому календарю
+    if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
+    date[0] = date[0].toInt().toString()
+    date[1] = monthDigit[date[1].toInt() - 1]
+
+    return date.joinToString(separator = " ")
+}
 
 /**
  * Средняя
@@ -116,19 +132,28 @@ fun dateDigitToStr(digital: String): String = TODO()
  * Все символы в номере, кроме цифр, пробелов и +-(), считать недопустимыми.
  * При неверном формате вернуть пустую строку
  */
-fun flattenPhoneNumber(phone: String): String = TODO()
+
+fun flattenPhoneNumber(phone: String): String =
+        if (Regex("""(\+?|\d)\d+?\s*(\(\d+\))?((\s*-*)*\d+)+""").matches(phone))
+            phone.replace(Regex("""\s|-|\(|\)"""), "")
+        else ""
 
 /**
  * Средняя
  *
  * Результаты спортсмена на соревнованиях в прыжках в длину представлены строкой вида
  * "706 - % 717 % 703".
- * В строке могут присутствовать числа, черточки - и знаки процента %, разделённые пробелами;
+ * * В строке могут присутствовать числа, черточки - и знаки процента %, разделённые пробелами;
  * число соответствует удачному прыжку, - пропущенной попытке, % заступу.
  * Прочитать строку и вернуть максимальное присутствующее в ней число (717 в примере).
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
-fun bestLongJump(jumps: String): Int = TODO()
+fun bestLongJump(jumps: String): Int {
+    if (jumps.contains(Regex("""[^\s\d-%+]"""))) {
+        return -1
+    }
+    return -1
+}
 
 /**
  * Сложная
