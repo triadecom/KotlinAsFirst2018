@@ -2,7 +2,9 @@
 
 package lesson6.task1
 
+import lesson1.task1.quadraticRootProduct
 import lesson2.task2.daysInMonth
+import java.lang.IllegalArgumentException
 import java.time.Month
 import java.time.Year
 
@@ -149,10 +151,15 @@ fun flattenPhoneNumber(phone: String): String =
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
-    if (jumps.contains(Regex("""[^\s\d-%+]"""))) {
-        return -1
+    if (jumps.contains(Regex("""[^\s\d-%+]"""))) return -1
+    val res = mutableListOf<Int>()
+    val spl = jumps.split(" ")
+
+    for (i in 0 until spl.size) {
+        if ((spl[i].length > 1) && (Regex("""[^\d]""").matches(spl[i]))) return -1
+        if (Regex("""\d""").matches(spl[i])) res.add(spl[i].toInt())
     }
-    return -1
+    return res.max()!!
 }
 
 /**
@@ -176,7 +183,19 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Вернуть значение выражения (6 для примера).
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
-fun plusMinus(expression: String): Int = TODO()
+fun plusMinus(expression: String): Int {
+    if (Regex("""\d+(\s[+-]\s\d+)*""").matches(expression)) {
+        val exp = expression.split(" ")
+        var res = exp[0].toInt()
+
+        for (i in 1 until exp.size) {
+            if (((i % 2) != 0) && (exp[i] == "+")) res += exp[i + 1].toInt()
+            if (((i % 2) != 0) && (exp[i] == "-")) res -= exp[i + 1].toInt()
+        }
+        return res
+    }
+    throw IllegalArgumentException()
+}
 
 /**
  * Сложная
@@ -187,7 +206,17 @@ fun plusMinus(expression: String): Int = TODO()
  * Вернуть индекс начала первого повторяющегося слова, или -1, если повторов нет.
  * Пример: "Он пошёл в в школу" => результат 9 (индекс первого 'в')
  */
-fun firstDuplicateIndex(str: String): Int = TODO()
+fun firstDuplicateIndex(str: String): Int {
+    val strList = str.toLowerCase().split(" ")
+    var index = 0
+
+    if (strList.isNotEmpty()) {
+        for (i in 0 until strList.size - 1)
+            if (strList[i] == strList[i + 1]) return index
+            else index += strList[i].length + 1
+    }
+    return -1
+}
 
 /**
  * Сложная
@@ -252,3 +281,5 @@ fun fromRoman(roman: String): Int = TODO()
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+
+

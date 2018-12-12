@@ -226,6 +226,41 @@ class Tests {
                         )
                 )
         )
+        assertEquals(
+                mapOf(
+                        "Arthas" to setOf("Uter", "Illidan", "GulDan", "KelThuzad", "Mannoroth"),
+                        "Uter" to setOf("GulDan", "Mannoroth"),
+                        "Illidan" to setOf("Arthas", "KelThuzad", "GulDan", "KelThuzad", "Mannoroth", "Uter"),
+                        "GulDan" to setOf("Mannoroth"),
+                        "KelThuzad" to setOf(),
+                        "Mannoroth" to setOf()
+                ),
+                propagateHandshakes(
+                        mapOf(
+                                "Arthas" to setOf("Uter", "Illidan"),
+                                "Uter" to setOf("GulDan"),
+                                "Illidan" to setOf("Arthas", "KelThuzad"),
+                                "GulDan" to setOf("Mannoroth")
+                        )
+                )
+        )
+        assertEquals(
+                mapOf(
+                        "Pudge" to setOf("Troll", "Axe"),
+                        "Nyx" to setOf("Windranger"),
+                        "Troll" to setOf("Axe", "Pudge"),
+                        "Axe" to setOf("Troll", "Pudge"),
+                        "Windranger" to setOf()
+                ),
+                propagateHandshakes(
+                        mapOf(
+                                "Pudge" to setOf("Troll"),
+                                "Nyx" to setOf("Nyx", "Windranger"),
+                                "Troll" to setOf("Axe"),
+                                "Axe" to setOf("Troll", "Pudge")
+                        )
+                )
+        )
     }
 
     @Test
@@ -258,6 +293,10 @@ class Tests {
                 emptyList<String>(),
                 whoAreInBoth(listOf("Marat", "Mikhail"), listOf("Sveta", "Kirill"))
         )
+        assertEquals(
+                listOf("Arthas", "Illidan"),
+                whoAreInBoth(listOf("Arthas", "Mannoroth", "Uter", "Illidan"), listOf("Illidan", "Arthas", "Jaina"))
+        )
     }
 
     @Test
@@ -266,6 +305,16 @@ class Tests {
         assertFalse(canBuildFrom(emptyList(), "foo"))
         assertTrue(canBuildFrom(listOf('a', 'b', 'o'), "baobab"))
         assertFalse(canBuildFrom(listOf('a', 'm', 'r'), "Marat"))
+        assertFalse(canBuildFrom(listOf('j', 'l', 'i'), "Intellij"))
+        // проверка на регистр
+        assertTrue(canBuildFrom(listOf('k', 'O', 't', 'L', 'i', 'N'), "Kotlin"))
+        assertTrue(canBuildFrom(listOf('p', 'o', 'l', 'y', 't', 'e', 'c', 'h'), "PoLyTeCh"))
+        // проверка на пробел
+        assertTrue(canBuildFrom(listOf('s', 'a', 'i', 'n', 't', 'p', 'e', 'b', 'u', 'r', 'g', ' '), "Saint Petersburg"))
+        assertFalse(canBuildFrom(listOf('s', 'a', 'i', 'n', 't', 'p', 'e', 'b', 'u', 'r', 'g'), "Saint Petersburg"))
+        // проверка на знаки
+        assertTrue(canBuildFrom(listOf('k', 'o', 't', 'e', 'd', '-'), "KoT-OeD"))
+        assertFalse(canBuildFrom(listOf('k', 'o', 't', 'e', 'd'), "Kot-OeD"))
     }
 
     @Test
@@ -325,6 +374,36 @@ class Tests {
                 bagPacking(
                         mapOf("Кубок" to (500 to 2000), "Слиток" to (1000 to 5000)),
                         450
+                )
+        )
+        assertEquals(
+                setOf("Корона", "Слиток", "Изумруд"),
+                bagPacking(
+                        mapOf(
+                                "Корона" to (100 to 1500),
+                                "Часы" to (150 to 2000),
+                                "Слиток" to (300 to 2500),
+                                "Рубин" to (400 to 3000),
+                                "Изумруд" to (450 to 3550),
+                                "Сапфир" to (600 to 3900),
+                                "Лазурит" to (700 to 4100),
+                                "Монеты" to (750 to 5200),
+                                "Бриллиант" to (850 to 5500)
+                        ),
+                        850
+                )
+        )
+        assertEquals(
+                setOf("Часы", "Рубин", "Сапфир"),
+                bagPacking(
+                        mapOf(
+                                "Часы" to (150 to 800),
+                                "Монеты" to (175 to 1000),
+                                "Рубин" to (250 to 1200),
+                                "Сапфир" to (350 to 1400),
+                                "Алмаз" to (550 to 2000)
+                        ),
+                        750
                 )
         )
     }
