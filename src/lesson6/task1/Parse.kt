@@ -5,8 +5,10 @@ package lesson6.task1
 import lesson1.task1.quadraticRootProduct
 import lesson2.task2.daysInMonth
 import java.lang.IllegalArgumentException
+import lesson4.task1.*
 import java.time.Month
 import java.time.Year
+import java.util.*
 
 /**
  * Пример
@@ -229,7 +231,17 @@ fun firstDuplicateIndex(str: String): Int {
  * или пустую строку при нарушении формата строки.
  * Все цены должны быть больше либо равны нуля.
  */
-fun mostExpensive(description: String): String = TODO()
+fun mostExpensive(description: String): String {
+    if (!Regex("""([а-яА-Я]+\s\d+\.?\d+?;\s)*[а-яА-Я]+\s\d+\.?\d+?""").matches(description)) return ""
+    val costMap = mutableMapOf<Double, String>()
+    val str = description.split("; ")
+    val costs = str.map{ it.split(" ")[1].toDouble() }
+
+    for (item in str) {
+        costMap[item.split(" ")[1].toDouble()] = item.split(" ")[0]
+    }
+    return costMap.getValue(costs.max()!!)
+}
 
 /**
  * Сложная
@@ -242,7 +254,36 @@ fun mostExpensive(description: String): String = TODO()
  *
  * Вернуть -1, если roman не является корректным римским числом
  */
-fun fromRoman(roman: String): Int = TODO()
+
+fun fromRoman(roman: String): Int {
+    var result = 0
+    val str = mutableListOf<Int>()
+    val romanCharMap = mapOf(
+            'I' to 1,
+            'V' to 5,
+            'X' to 10,
+            'L' to 50,
+            'C' to 100,
+            'D' to 500,
+            'M' to 1000
+    )
+    if (!Regex("""^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})${'$'}""").matches(roman)) return -1
+    // переводим символы в цифры
+    for (i in 0 until roman.toList().size) {
+        str.add(romanCharMap.getValue(roman.toList()[i]))
+    }
+    // Если число из одного знака, то следующий цикл пройти оно точно не сможет
+    if (str.size == 1) return str[0]
+    // Цикл по переводу
+    if (str.size > 1) {
+        result = str[0]
+        for (i in 1 until str.size) {
+            if (str[i] <= str[i - 1]) result += str[i]
+            else if (str[i] > str[i - 1]) result += (str[i] - (str[i - 1] * 2))
+        }
+    }
+    return result
+}
 
 /**
  * Очень сложная
@@ -280,6 +321,10 @@ fun fromRoman(roman: String): Int = TODO()
  * IllegalArgumentException должен бросаться даже если ошибочная команда не была достигнута в ходе выполнения.
  *
  */
-fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> = TODO()
+fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
+    if (!Regex("""[+<>\[\]\s-]*""").matches(commands)) throw IllegalArgumentException()
+    // в скором времени, эта задача будет отправлена вместе с готовым седьмым уроком
+    return emptyList()
+}
 
 
