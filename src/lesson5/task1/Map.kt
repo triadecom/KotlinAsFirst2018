@@ -3,9 +3,7 @@
 package lesson5.task1
 
 import lesson4.task1.mean
-import java.util.*
 import javax.swing.plaf.SeparatorUI
-import java.util.Random
 
 /**
  * Пример
@@ -203,39 +201,7 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *          "Mikhail" to setOf("Sveta", "Marat")
  *        )
  */
-
-/*
-решение через циклы
-будет две функции
-handshakes - ищет рукопожатия по первой линии для определенного человека
-propagateHandshakes - цикличная функция для поиска всех рукопожатий человека
-
-hanshakes
-плюсует все рукопожатия известные человеку
-дяя одного цикла
- */
-
-fun handshakes(friends: Map<String, Set<String>>, name: String): Set<String> {
-    val result = mutableSetOf<String>()
-    val res = mutableMapOf<String, Set<String>>()
-
-    for ((item, key) in friends) {
-        if (item == name) return key
-    }
-
-    return result
-}
-
-
-fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val result = friends
-
-    for ((name, relations) in friends) {
-
-    }
-
-    return result
-}
+fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> = TODO()
 
 /**
  * Простая
@@ -304,14 +270,8 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  * Например:
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
-fun hasAnagrams(words: List<String>): Boolean {
-    val res = words.map { it.toLowerCase().toSortedSet() }
-    for (item in words) {
-        val count = words.indexOf(item)
-        for (i in 0 until words.size - 1) if (i != count && res[count] == res[i]) return true
-    }
-    return false
-}
+fun hasAnagrams(words: List<String>): Boolean =
+        (words.map { it.reversed() } intersect words).isNotEmpty()
 
 /**
  * Сложная
@@ -331,7 +291,7 @@ fun hasAnagrams(words: List<String>): Boolean {
  *   findSumOfTwo(listOf(1, 2, 3), 6) -> Pair(-1, -1)
  */
 fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
-    val map = mutableMapOf<Int, Int>()
+val map = mutableMapOf<Int, Int>()
 
     for ((key, value) in list.withIndex()) {
         val result = map[number - value]
@@ -363,78 +323,4 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  *     450
  *   ) -> emptySet()
  */
-
-fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val result = mutableSetOf<String>()
-    val sortedMap = treasures.toMutableMap()
-    var weight = 0
-    val variants = mutableListOf<Int>()
-    val a = mutableSetOf<Int>()
-    var count = 0
-    val itemName = mutableListOf<String>()
-    val itemWeight = mutableListOf<Int>()
-    val itemPrice = mutableListOf<Int>()
-
-    // проверка множества на пустоту
-    if (treasures.isEmpty()) return emptySet()
-    // очищение множества от предметов, вес которых превышает вместимость рюкзака
-    for ((name, value) in treasures) if (value.first > capacity) sortedMap.remove(name)
-    // проверка множества на возможность решения
-    if (sortedMap.isEmpty()) return emptySet()
-
-    for ((name, value) in sortedMap) {
-        itemName[count] = name
-        itemWeight[count] = value.first
-        itemPrice[count] = value.second
-        count++
-    }
-
-    val mapSize = itemName.size
-    val minWeight = itemWeight.min()
-    var costs = mutableMapOf<Int, Int>()
-
-    // на каждое значение веса будет своя максимальная сумма!
-
-    for (i in 0 until mapSize - 1) {
-        for (j in minWeight!! until capacity) {
-            weight = j
-
-        }
-    }
-
-
-    return result
-}
-
-
-/*
-// wts - Pair.second
-// cost - Pair.first
-
-
-
-//wts - массив весов, cost - массив стоимостей предметов, capacity - вместимость рюкзака
-//функция возвращает максимальную стоимость, которую можно набрать(решение задачи о рюкзаке
-//с повторениями)
-//массив dp собственно реализует динамическое программирование, описанное в статье, как K_w
-int knapsack1(const std::vector<int>& wts, const std::vector<int>& cost, int W)
-
-	size_t n = wts.size();
-	std::vector<int> dp(W + 1);
-	dp[0] = 0;
-	for (int w = 1; w <= capacity; w++)
-	{
-		dp[w] = dp[w-1];
-		for (size_t i = 0; i < n; i++)
-		{
-			if (wts[i] <= w)
-			{
-				dp[w] = std::max(dp[w], dp[w - wts[i]] + cost[i]);
-			}
-		}
-	}
-	return dp[capacity];
-
- */
-
-
+fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> = TODO()
