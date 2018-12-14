@@ -204,37 +204,34 @@ fun findCheapestStuff(stuff: Map<String, Pair<String, Double>>, kind: String): S
  *        )
  */
 
-/*
-решение через циклы
-будет две функции
-handshakes - ищет рукопожатия по первой линии для определенного человека
-propagateHandshakes - цикличная функция для поиска всех рукопожатий человека
-
-hanshakes
-плюсует все рукопожатия известные человеку
-дяя одного цикла
- */
-
-fun handshakes(friends: Map<String, Set<String>>, name: String): Set<String> {
-    val result = mutableSetOf<String>()
-    val res = mutableMapOf<String, Set<String>>()
-
-    for ((item, key) in friends) {
-        if (item == name) return key
-    }
-
-    return result
-}
-
-
 fun propagateHandshakes(friends: Map<String, Set<String>>): Map<String, Set<String>> {
-    val result = friends
+    val base = mutableMapOf<String, MutableSet<String>>()
 
     for ((name, relations) in friends) {
-
+        base[name] = relations.toMutableSet()
+        for (item in relations) if (!base.containsKey(item)) base[item] = mutableSetOf()
     }
 
-    return result
+    for ((key, value) in base)
+        base[key] = relations(base.map { it.key to it.value.toMutableSet() }.toMap(), key)
+
+    return base.toMap()
+
+}
+
+// Рекурсивная функция на поиск добавление в множество всех отношений для нужного человека
+
+fun relations(friends: Map<String, MutableSet<String>>, name: String): MutableSet<String> {
+    val relationSet = mutableSetOf<String>()
+
+    while (friends.getValue(name).isNotEmpty()) {
+        val str = friends.getValue(name).first().toString()
+        friends.getValue(name).remove(str)
+        relationSet.add(str)
+        relationSet.addAll(relations(friends, str))
+    }
+
+    return relationSet.toSortedSet().filter { it != name }.toMutableSet()
 }
 
 /**
@@ -261,7 +258,9 @@ fun subtractOf(a: MutableMap<String, String>, b: Map<String, String>): Unit {
  *
  * Для двух списков людей найти людей, встречающихся в обоих списках
  */
-fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = (a intersect b).toList()
+fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = (a.toSet().intersect(b.toSet())).toList()
+//= a.filter { it in b }.toSet().toList()
+// = (a intersect b).toList()
 
 /**
  * Средняя
@@ -273,7 +272,7 @@ fun whoAreInBoth(a: List<String>, b: List<String>): List<String> = (a intersect 
  *   canBuildFrom(listOf('a', 'b', 'o'), "baobab") -> true
  */
 fun canBuildFrom(chars: List<Char>, word: String): Boolean =
-        chars.map { it.toLowerCase() }.containsAll(word.toLowerCase().toList())
+        chars.toSet().map { it.toLowerCase() }.containsAll(word.toLowerCase().toSet())
 
 /**
  * Средняя
@@ -365,76 +364,44 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
-    val result = mutableSetOf<String>()
-    val sortedMap = treasures.toMutableMap()
-    var weight = 0
-    val variants = mutableListOf<Int>()
-    val a = mutableSetOf<Int>()
-    var count = 0
-    val itemName = mutableListOf<String>()
-    val itemWeight = mutableListOf<Int>()
-    val itemPrice = mutableListOf<Int>()
 
-    // проверка множества на пустоту
-    if (treasures.isEmpty()) return emptySet()
-    // очищение множества от предметов, вес которых превышает вместимость рюкзака
-    for ((name, value) in treasures) if (value.first > capacity) sortedMap.remove(name)
-    // проверка множества на возможность решения
-    if (sortedMap.isEmpty()) return emptySet()
+    /*
+       Признаюсь честно - решение и алгоритм подсмотрел в интернете
+       Но само задание понял, суть решения в динамическом программировании
+       собсвтенно, основываясь на этом принципе, мы решаем задачу
+       через разбиение ее на подзадачи, которые рекуррентно связанны между собой
+       это как раз таки и реализовано в рекурсивной функции findResult.
+    */
 
-    for ((name, value) in sortedMap) {
-        itemName[count] = name
-        itemWeight[count] = value.first
-        itemPrice[count] = value.second
-        count++
-    }
+    var result = setOf<String>()
+    var mass: Int
+    var price: Int
+    val countSac = capacity + 1
+    val costs = Array(treasures.size + 1) { Array(countSac) { 0 } }
 
-    val mapSize = itemName.size
-    val minWeight = itemWeight.min()
-    var costs = mutableMapOf<Int, Int>()
+    for (i in 0 until treasures.size + 1) costs[i][0] = 0
+    for (i in 0 until countSac) costs[0][i] = 0
+    for (i in 1 until treasures.size + 1) {
+        for (m in 1 until countSac) {
+            mass = treasures.values.toList()[i - 1].first
+            price = treasures.values.toList()[i - 1].second
 
-    // на каждое значение веса будет своя максимальная сумма!
-
-    for (i in 0 until mapSize - 1) {
-        for (j in minWeight!! until capacity) {
-            weight = j
-
+            if (mass <= m) costs[i][m] = maxOf(costs[i - 1][m], costs[i - 1][m - mass] + price)
+            else costs[i][m] = costs[i - 1][m]
         }
     }
+    fun findResult(k: Int, s: Int) {
+        if (costs[k][s] == 0)
+            return
+        if (costs[k - 1][s] == costs[k][s])
+            findResult(k - 1, s)
+        else {
+            findResult(k - 1, s - treasures.values.toList()[k - 1].first)
+            result += treasures.keys.toList()[k - 1]
+        }
 
-
+    }
+    findResult(treasures.size, countSac - 1)
     return result
 }
-
-
-/*
-// wts - Pair.second
-// cost - Pair.first
-
-
-
-//wts - массив весов, cost - массив стоимостей предметов, capacity - вместимость рюкзака
-//функция возвращает максимальную стоимость, которую можно набрать(решение задачи о рюкзаке
-//с повторениями)
-//массив dp собственно реализует динамическое программирование, описанное в статье, как K_w
-int knapsack1(const std::vector<int>& wts, const std::vector<int>& cost, int W)
-
-	size_t n = wts.size();
-	std::vector<int> dp(W + 1);
-	dp[0] = 0;
-	for (int w = 1; w <= capacity; w++)
-	{
-		dp[w] = dp[w-1];
-		for (size_t i = 0; i < n; i++)
-		{
-			if (wts[i] <= w)
-			{
-				dp[w] = std::max(dp[w], dp[w - wts[i]] + cost[i]);
-			}
-		}
-	}
-	return dp[capacity];
-
- */
-
 
