@@ -219,8 +219,7 @@ fun factorize(n: Int): List<Int> {
             a++
         }
     }
-
-    return result.sorted()
+    return result
 }
 
 
@@ -232,7 +231,6 @@ fun factorize(n: Int): List<Int> {
  * Множители в результирующей строке должны располагаться по возрастанию.
  */
 fun factorizeToString(n: Int): String = factorize(n).joinToString(separator = "*")
-
 
 /**
  * Средняя
