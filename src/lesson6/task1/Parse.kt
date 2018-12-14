@@ -93,7 +93,7 @@ fun dateStrToDigit(str: String): String {
     date[1] = (monthDigit.indexOf(date[1].toLowerCase()) + 1).toString()
     if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
     // представляем день и месяц двумя числами
-    for (i in 0..1) if (date[i].toInt() < 10) date[i] = "0" + date[i]
+    for (i in 0..1) if (date[i].toInt() < 10) date[i] = "0" + date[i].toInt()
 
     return date.joinToString(separator = ".")
 }
@@ -138,7 +138,7 @@ fun dateDigitToStr(digital: String): String {
  */
 
 fun flattenPhoneNumber(phone: String): String =
-        if (Regex("""(\+?|\d)\d+?\s*(\(\d+\))?((\s*-*)*\d+)+""").matches(phone))
+        if (Regex("""((\+?|\d)\d+?\s*(\(\d+\))?((\s*-*)*\d+)+|\d+)""").matches(phone))
             phone.replace(Regex("""\s|-|\(|\)"""), "")
         else ""
 
@@ -232,7 +232,27 @@ fun firstDuplicateIndex(str: String): Int {
  * Все цены должны быть больше либо равны нуля.
  */
 fun mostExpensive(description: String): String {
-    if (!Regex("""([а-яА-Я]+\s\d+\.?\d+?;\s)*[а-яА-Я]+\s\d+\.?\d+?""").matches(description)) return ""
+    val costMap = mutableMapOf<Double, String>()
+    val str = description.split("; ")
+    var costs = listOf<Double>()
+
+    for (item in str) if (item.split(" ").size != 2) return ""
+    try {
+        costs = str.map { it.split(" ")[1].toDouble() }
+    } catch (e: NumberFormatException) {
+        return ""
+    }
+    for (item in str) {
+        if (item.split(" ")[1].toDouble() < 0.0) return ""
+        costMap[item.split(" ")[1].toDouble()] = item.split(" ")[0]
+    }
+    return costMap.getValue(costs.max()!!)
+}
+
+
+/*
+На случай, если имя товара состоит только из букв
+    if (!Regex("""(\w+\s\d+\.?\d+?;\s)*\w+\s\d+\.?\d+?""").matches(description)) return ""
     val costMap = mutableMapOf<Double, String>()
     val str = description.split("; ")
     val costs = str.map{ it.split(" ")[1].toDouble() }
@@ -241,7 +261,7 @@ fun mostExpensive(description: String): String {
         costMap[item.split(" ")[1].toDouble()] = item.split(" ")[0]
     }
     return costMap.getValue(costs.max()!!)
-}
+    */
 
 /**
  * Сложная
@@ -267,7 +287,8 @@ fun fromRoman(roman: String): Int {
             'D' to 500,
             'M' to 1000
     )
-    if (!Regex("""^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})${'$'}""").matches(roman)) return -1
+    if ((!Regex("""^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})${'$'}""").matches(roman)) ||
+            roman.isEmpty()) return -1
     // переводим символы в цифры
     for (i in 0 until roman.toList().size) {
         str.add(romanCharMap.getValue(roman.toList()[i]))

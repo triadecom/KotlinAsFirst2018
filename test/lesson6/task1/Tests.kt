@@ -39,7 +39,7 @@ class Tests {
         assertEquals("18.11.2018", dateStrToDigit("18 ноября 2018"))
         assertEquals("18.11.2018", dateStrToDigit("18 Ноября 2018"))
         assertEquals("", dateStrToDigit("23"))
-        assertEquals("03.04.2011", dateStrToDigit("3 апреля 2011"))
+        assertEquals("03.04.2011", dateStrToDigit("03 апреля 2011"))
         assertEquals("03.04.2011", dateStrToDigit("3 АпРеЛя 2011"))
         assertEquals("", dateStrToDigit("32 сентября 2011"))
         assertEquals("", dateStrToDigit("29 февраля 1993"))
@@ -65,6 +65,7 @@ class Tests {
     @Tag("Normal")
     fun flattenPhoneNumber() {
         assertEquals("79211234567", flattenPhoneNumber("79211234567"))
+        assertEquals("2", flattenPhoneNumber("2"))
         assertEquals("+79211234567", flattenPhoneNumber("+79211234567"))
         assertEquals("+79211234567", flattenPhoneNumber("+7 (921) 123-45-67"))
         assertEquals("89991235455", flattenPhoneNumber("8 (999) 123 -- 54 -- 55"))
@@ -134,6 +135,7 @@ class Tests {
     @Tag("Hard")
     fun fromRoman() {
         assertEquals(1, fromRoman("I"))
+        assertEquals(-1, fromRoman(""))
         assertEquals(3000, fromRoman("MMM"))
         assertEquals(1978, fromRoman("MCMLXXVIII"))
         assertEquals(694, fromRoman("DCXCIV"))

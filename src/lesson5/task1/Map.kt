@@ -304,10 +304,13 @@ fun extractRepeats(list: List<String>): Map<String, Int> {
  *   hasAnagrams(listOf("тор", "свет", "рот")) -> true
  */
 fun hasAnagrams(words: List<String>): Boolean {
-    val res = words.map { it.toLowerCase().toSortedSet() }
+    val res = mutableSetOf<Set<Char>>()
+    var sortedRes = setOf<Char>()
+
     for (item in words) {
-        val count = words.indexOf(item)
-        for (i in 0 until words.size - 1) if (i != count && res[count] == res[i]) return true
+        sortedRes = item.toSet()
+        if (sortedRes in res) return true
+        res.add(sortedRes)
     }
     return false
 }
