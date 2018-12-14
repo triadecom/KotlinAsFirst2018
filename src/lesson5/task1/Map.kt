@@ -347,7 +347,7 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  * "название сокровища"-"пара (вес сокровища, цена сокровища)"
  * и вместимость вашего рюкзака.
  * Необходимо вернуть множество сокровищ с максимальной суммарной стоимостью,
- * которые вы можете унести в рюкзаке.
+ * которые вы можете унести в рюкзаке .
  *
  * Например:
  *   bagPacking(
@@ -361,7 +361,6 @@ fun findSumOfTwo(list: List<Int>, number: Int): Pair<Int, Int> {
  */
 
 
-
 fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<String> {
 
     /*
@@ -370,7 +369,7 @@ fun bagPacking(treasures: Map<String, Pair<Int, Int>>, capacity: Int): Set<Strin
        собсвтенно, основываясь на этом принципе, мы решаем задачу
        через разбиение ее на подзадачи, которые рекуррентно связанны между собой
        это как раз таки и реализовано в рекурсивной функции findResult.
-    */
+       */
 
     var result = setOf<String>()
     var mass: Int
