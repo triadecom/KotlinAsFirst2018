@@ -174,7 +174,6 @@ fun bestHighJump(jumps: String): Int {
     val str = jumps.split(Regex("""[\s%-]+"""))
     val result = mutableListOf<Int>()
 
-
     for (i in 0 until str.size) {
         if (str[i].contains("+")) result.add(str[i - 1].toInt())
     }
