@@ -319,7 +319,7 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    if (!Regex("""[+<>\[\]\s-]+""").matches(commands)) throw IllegalArgumentException()
+    if (!Regex("""[+<>\[\]\s-]*""").matches(commands)) throw IllegalArgumentException()
     // проверяем, все ли скобки закрыты
     if (commands.contains(Regex("""[\[\]]+"""))) {
         var ct = 0
@@ -360,7 +360,6 @@ fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
                     else if (commands[count] == '[') pass--
                 }
             }
-            else -> throw IllegalArgumentException()
         }
         count++
         cmdCount++
