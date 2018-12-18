@@ -88,7 +88,9 @@ class Tests {
         assertEquals(717, bestLongJump("706 % - 717 - 703"))
         assertEquals(-1, bestLongJump("% - - % -"))
         assertEquals(754, bestLongJump("700 717 707 % 754"))
-        assertEquals(-1, bestLongJump("700 + 700"))
+        assertEquals(-1, bestLongJump(" 700 % 110"))
+        assertEquals(-1, bestLongJump("   - % - % + 700"))
+        assertEquals(-1, bestLongJump(""))
 
     }
 
@@ -117,6 +119,7 @@ class Tests {
     @Test
     @Tag("Hard")
     fun firstDuplicateIndex() {
+        assertEquals(-1, firstDuplicateIndex(""))
         assertEquals(-1, firstDuplicateIndex("Привет"))
         assertEquals(9, firstDuplicateIndex("Он пошёл в в школу"))
         assertEquals(40, firstDuplicateIndex("Яблоко упало на ветку с ветки оно упало на на землю"))
@@ -135,6 +138,7 @@ class Tests {
     @Tag("Hard")
     fun fromRoman() {
         assertEquals(1, fromRoman("I"))
+        assertEquals(2, fromRoman("II"))
         assertEquals(-1, fromRoman(""))
         assertEquals(3000, fromRoman("MMM"))
         assertEquals(1978, fromRoman("MCMLXXVIII"))

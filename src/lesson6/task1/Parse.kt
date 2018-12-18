@@ -92,10 +92,8 @@ fun dateStrToDigit(str: String): String {
     // проверяем дату на корректность по григорианскому календарю
     date[1] = (monthDigit.indexOf(date[1].toLowerCase()) + 1).toString()
     if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
-    // представляем день и месяц двумя числами
-    for (i in 0..1) if (date[i].toInt() < 10) date[i] = "0" + date[i].toInt()
-
-    return date.joinToString(separator = ".")
+    // представляем день и месяц двумя числами через форматирование строки
+    return String.format("%02d.%02d.%d", date[0].toInt(), date[1].toInt(), date[2].toInt())
 }
 
 /**
@@ -118,7 +116,6 @@ fun dateDigitToStr(digital: String): String {
     }
     // проверяем дату на корректность по григорианскому календарю
     if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
-    date[0] = date[0].toInt().toString()
     date[1] = monthDigit[date[1].toInt() - 1]
 
     return date.joinToString(separator = " ")
@@ -153,14 +150,11 @@ fun flattenPhoneNumber(phone: String): String =
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
-    if (jumps.contains(Regex("""[^\s\d-%+]"""))) return -1
+    if (!Regex("""[\d%-]+(\s[\d%-]+)*""").matches(jumps) ||
+            !jumps.contains(Regex("""\d"""))) return -1
     val res = mutableListOf<Int>()
-    val spl = jumps.split(" ")
+    jumps.split(" ").forEach { if (Regex("""\d+""").matches(it)) res.add(it.toInt()) }
 
-    for (i in 0 until spl.size) {
-        if ((spl[i].length > 1) && (Regex("""[^\d]""").matches(spl[i]))) return -1
-        if (Regex("""\d""").matches(spl[i])) res.add(spl[i].toInt())
-    }
     return res.max()!!
 }
 
@@ -174,7 +168,15 @@ fun bestLongJump(jumps: String): Int {
  * Прочитать строку и вернуть максимальную взятую высоту (230 в примере).
  * При нарушении формата входной строки вернуть -1.
  */
-fun bestHighJump(jumps: String): Int = TODO()
+fun bestHighJump(jumps: String): Int {
+    if (!Regex("""[\d%+\s\-]+""").matches(jumps)) return -1
+    val str = jumps.split(Regex("""[\s%-]+"""))
+    val result = mutableListOf<Int>()
+    for (i in 0 until str.size) {
+        if (str[i].contains("+")) result.add(str[i - 1].toInt())
+    }
+    return result.max() ?: -1
+}
 
 /**
  * Сложная
@@ -186,17 +188,18 @@ fun bestHighJump(jumps: String): Int = TODO()
  * Про нарушении формата входной строки бросить исключение IllegalArgumentException
  */
 fun plusMinus(expression: String): Int {
-    if (Regex("""\d+(\s[+-]\s\d+)*""").matches(expression)) {
-        val exp = expression.split(" ")
-        var res = exp[0].toInt()
+    if (!Regex("""\d+(\s[+-]\s\d+)*""").matches(expression))
+        throw IllegalArgumentException()
+    val exp = expression.split(" ")
+    var res = exp[0].toInt()
+    var i = 0
 
-        for (i in 1 until exp.size) {
-            if (((i % 2) != 0) && (exp[i] == "+")) res += exp[i + 1].toInt()
-            if (((i % 2) != 0) && (exp[i] == "-")) res -= exp[i + 1].toInt()
-        }
-        return res
+    while (i + 2 < exp.size) {
+        if (exp[i + 1] == "+") res += exp[i + 2].toInt()
+        if (exp[i + 1] == "-") res -= exp[i + 2].toInt()
+        i++
     }
-    throw IllegalArgumentException()
+    return res
 }
 
 /**
@@ -212,11 +215,9 @@ fun firstDuplicateIndex(str: String): Int {
     val strList = str.toLowerCase().split(" ")
     var index = 0
 
-    if (strList.isNotEmpty()) {
-        for (i in 0 until strList.size - 1)
-            if (strList[i] == strList[i + 1]) return index
-            else index += strList[i].length + 1
-    }
+    for (i in 0 until strList.size - 1)
+        if (strList[i].toLowerCase() == strList[i + 1].toLowerCase()) return index
+        else index += strList[i].length + 1
     return -1
 }
 
@@ -234,19 +235,17 @@ fun firstDuplicateIndex(str: String): Int {
 fun mostExpensive(description: String): String {
     val costMap = mutableMapOf<Double, String>()
     val str = description.split("; ")
-    var costs = listOf<Double>()
+    var res = ""
 
     for (item in str) if (item.split(" ").size != 2) return ""
-    try {
-        costs = str.map { it.split(" ")[1].toDouble() }
-    } catch (e: NumberFormatException) {
-        return ""
-    }
+
     for (item in str) {
         if (item.split(" ")[1].toDouble() < 0.0) return ""
         costMap[item.split(" ")[1].toDouble()] = item.split(" ")[0]
+        if (item.split(" ")[1].toDouble() == costMap.keys.max())
+            res = costMap.getValue(item.split(" ")[1].toDouble())
     }
-    return costMap.getValue(costs.max()!!)
+    return res
 }
 
 
@@ -276,7 +275,8 @@ fun mostExpensive(description: String): String {
  */
 
 fun fromRoman(roman: String): Int {
-    var result = 0
+    if ((!Regex("""^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})${'$'}""").matches(roman))
+            || roman.isEmpty()) return -1  // Проверка строки на ошибки вначале функции делает её выполнение быстрее
     val str = mutableListOf<Int>()
     val romanCharMap = mapOf(
             'I' to 1,
@@ -287,21 +287,11 @@ fun fromRoman(roman: String): Int {
             'D' to 500,
             'M' to 1000
     )
-    if ((!Regex("""^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})${'$'}""").matches(roman)) ||
-            roman.isEmpty()) return -1
-    // переводим символы в цифры
-    for (i in 0 until roman.toList().size) {
-        str.add(romanCharMap.getValue(roman.toList()[i]))
-    }
-    // Если число из одного знака, то следующий цикл пройти оно точно не сможет
-    if (str.size == 1) return str[0]
-    // Цикл по переводу
-    if (str.size > 1) {
-        result = str[0]
-        for (i in 1 until str.size) {
-            if (str[i] <= str[i - 1]) result += str[i]
-            else if (str[i] > str[i - 1]) result += (str[i] - (str[i - 1] * 2))
-        }
+    roman.toList().forEach { str.add(romanCharMap.getValue(it)) }  // Перевод с Римских чисел в Арабские
+    var result = str[0]
+    for (i in 1 until str.size) {
+        if (str[i] <= str[i - 1]) result += str[i]
+        else if (str[i] > str[i - 1]) result += (str[i] - (str[i - 1] * 2))
     }
     return result
 }
@@ -343,9 +333,56 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    if (!Regex("""[+<>\[\]\s-]*""").matches(commands)) throw IllegalArgumentException()
-    // в скором времени, эта задача будет отправлена вместе с готовым седьмым уроком
-    return emptyList()
-}
+    if (!Regex("""[+<>\[\]\s-]+""").matches(commands)) throw IllegalArgumentException()
+    var pos = cells / 2
+    val cmdAr = Array(cells) { 0 }
+    var count = 0
+    var checkOpened = 0
+    var checkClosed = 0
+    var maxComands = 0
 
+    for (item in commands) {
+        if (item == '[') checkOpened++
+        if (item == ']') checkClosed++
+    }
+    if (checkOpened != checkClosed) throw IllegalArgumentException()
+
+    while (commands.length > count && limit > maxComands) {
+        val actualCmd = commands[count]
+        when (actualCmd) {
+            ' ' -> {
+            }
+            '<' -> pos--
+            '>' -> pos++
+            '-' -> cmdAr[pos]--
+            '+' -> cmdAr[pos]++
+            '[' -> {
+                if (cmdAr[pos] == 0) {
+                    var pass = 1
+                    while (pass > 0) {
+                        count++
+                        if (commands[count] == '[') pass++
+                        else if (commands[count] == ']') pass--
+                    }
+                }
+            }
+            ']' -> {
+                if (cmdAr[pos] != 0) {
+                    var pass = 1
+                    while (pass > 0) {
+                        count--
+                        if (commands[count] == ']') pass++
+                        else if (commands[count] == '[') pass--
+                    }
+                }
+            }
+            else -> throw IllegalArgumentException()
+        }
+        count++
+        maxComands++
+        if (pos !in 0 until cells)
+            throw IllegalStateException()
+    }
+    return cmdAr.toList()
+}
 
