@@ -116,6 +116,7 @@ fun dateDigitToStr(digital: String): String {
     }
     // проверяем дату на корректность по григорианскому календарю
     if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
+    date[0] = String.format("%01d", date[0].toInt())
     date[1] = monthDigit[date[1].toInt() - 1]
 
     return date.joinToString(separator = " ")
@@ -172,6 +173,8 @@ fun bestHighJump(jumps: String): Int {
     if (!Regex("""[\d%+\s\-]+""").matches(jumps)) return -1
     val str = jumps.split(Regex("""[\s%-]+"""))
     val result = mutableListOf<Int>()
+
+
     for (i in 0 until str.size) {
         if (str[i].contains("+")) result.add(str[i - 1].toInt())
     }
@@ -192,12 +195,10 @@ fun plusMinus(expression: String): Int {
         throw IllegalArgumentException()
     val exp = expression.split(" ")
     var res = exp[0].toInt()
-    var i = 0
 
-    while (i + 2 < exp.size) {
-        if (exp[i + 1] == "+") res += exp[i + 2].toInt()
-        if (exp[i + 1] == "-") res -= exp[i + 2].toInt()
-        i++
+    for (i in 1 until exp.size step 2) {
+        if (exp[i] == "+") res += exp[i + 1].toInt()
+        if (exp[i] == "-") res -= exp[i + 1].toInt()
     }
     return res
 }
@@ -247,20 +248,6 @@ fun mostExpensive(description: String): String {
     }
     return res
 }
-
-
-/*
-На случай, если имя товара состоит только из букв
-    if (!Regex("""(\w+\s\d+\.?\d+?;\s)*\w+\s\d+\.?\d+?""").matches(description)) return ""
-    val costMap = mutableMapOf<Double, String>()
-    val str = description.split("; ")
-    val costs = str.map{ it.split(" ")[1].toDouble() }
-
-    for (item in str) {
-        costMap[item.split(" ")[1].toDouble()] = item.split(" ")[0]
-    }
-    return costMap.getValue(costs.max()!!)
-    */
 
 /**
  * Сложная
@@ -334,55 +321,53 @@ fun fromRoman(roman: String): Int {
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
     if (!Regex("""[+<>\[\]\s-]+""").matches(commands)) throw IllegalArgumentException()
-    var pos = cells / 2
-    val cmdAr = Array(cells) { 0 }
-    var count = 0
-    var checkOpened = 0
-    var checkClosed = 0
-    var maxComands = 0
-
-    for (item in commands) {
-        if (item == '[') checkOpened++
-        if (item == ']') checkClosed++
+    // проверяем, все ли скобки закрыты
+    if (commands.contains(Regex("""[\[\]]+"""))) {
+        var ct = 0
+        commands.toMutableList().forEach {
+            if (it == '[') ct++
+            if (it == ']') ct--
+        }
+        if (ct != 0) throw IllegalArgumentException()
     }
-    if (checkOpened != checkClosed) throw IllegalArgumentException()
 
-    while (commands.length > count && limit > maxComands) {
+    var pos = cells / 2
+    val res = mutableListOf<Int>()
+    repeat(cells) { res.add(0) }
+    var count = 0
+    var cmdCount = 0
+
+    while (count < commands.length && cmdCount < limit) {
         val actualCmd = commands[count]
         when (actualCmd) {
-            ' ' -> {
-            }
+            ' ' -> { }
             '<' -> pos--
             '>' -> pos++
-            '-' -> cmdAr[pos]--
-            '+' -> cmdAr[pos]++
-            '[' -> {
-                if (cmdAr[pos] == 0) {
-                    var pass = 1
-                    while (pass > 0) {
-                        count++
-                        if (commands[count] == '[') pass++
-                        else if (commands[count] == ']') pass--
-                    }
+            '-' -> res[pos]--
+            '+' -> res[pos]++
+            '[' -> if (res[pos] == 0) {
+                var pass = 1
+                while (pass > 0) {
+                    count++
+                    if (commands[count] == '[') pass++
+                    else if (commands[count] == ']') pass--
                 }
             }
-            ']' -> {
-                if (cmdAr[pos] != 0) {
-                    var pass = 1
-                    while (pass > 0) {
-                        count--
-                        if (commands[count] == ']') pass++
-                        else if (commands[count] == '[') pass--
-                    }
+            ']' -> if (res[pos] != 0) {
+                var pass = 1
+                while (pass > 0) {
+                    count--
+                    if (commands[count] == ']') pass++
+                    else if (commands[count] == '[') pass--
                 }
             }
             else -> throw IllegalArgumentException()
         }
         count++
-        maxComands++
-        if (pos !in 0 until cells)
-            throw IllegalStateException()
+        cmdCount++
+        // Проверяем, не ушла ли комманда за границы конвеера
+        if (pos !in 0 until cells) throw IllegalStateException()
     }
-    return cmdAr.toList()
+    return res
 }
 
