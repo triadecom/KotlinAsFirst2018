@@ -115,12 +115,14 @@ fun dateDigitToStr(digital: String): String {
         return ""
     }
     // проверяем дату на корректность по григорианскому календарю
+    if ((date[0].toInt() in 1..9) && (date[0].startsWith("0"))) date[0] = date[0].toList()[1].toString()
+    //if ((date[1].toInt() in 1..12) && (date[1].startsWith("0"))) date[1] = date[1].toList()[1].toString()
     if (date[0].toInt() > daysInMonth(date[1].toInt(), date[2].toInt())) return ""
-    date[0] = String.format("%01d", date[0].toInt())
     date[1] = monthDigit[date[1].toInt() - 1]
 
     return date.joinToString(separator = " ")
 }
+
 
 /**
  * Средняя
@@ -151,12 +153,10 @@ fun flattenPhoneNumber(phone: String): String =
  * При нарушении формата входной строки или при отсутствии в ней чисел, вернуть -1.
  */
 fun bestLongJump(jumps: String): Int {
-    if (!Regex("""[\d%-]+(\s[\d%-]+)*""").matches(jumps) ||
-            !jumps.contains(Regex("""\d"""))) return -1
+    if (!Regex("""[-%\s\d]+""").matches(jumps)) return -1
     val res = mutableListOf<Int>()
     jumps.split(" ").forEach { if (Regex("""\d+""").matches(it)) res.add(it.toInt()) }
-
-    return res.max()!!
+    return res.max() ?: -1
 }
 
 /**
@@ -173,7 +173,6 @@ fun bestHighJump(jumps: String): Int {
     if (!Regex("""[\d%+\s\-]+""").matches(jumps)) return -1
     val str = jumps.split(Regex("""[\s%-]+"""))
     val result = mutableListOf<Int>()
-
     for (i in 0 until str.size) {
         if (str[i].contains("+")) result.add(str[i - 1].toInt())
     }
@@ -319,17 +318,12 @@ fun fromRoman(roman: String): Int {
  *
  */
 fun computeDeviceCells(cells: Int, commands: String, limit: Int): List<Int> {
-    if (!Regex("""[+<>\[\]\s-]*""").matches(commands)) throw IllegalArgumentException()
-    // проверяем, все ли скобки закрыты
-    if (commands.contains(Regex("""[\[\]]+"""))) {
-        var ct = 0
-        commands.toMutableList().forEach {
-            if (it == '[') ct++
-            if (it == ']') ct--
-        }
-        if (ct != 0) throw IllegalArgumentException()
-    }
-
+    // проверяем, все ли условия соблюдены
+    if ((!Regex("""[+<>\[\]\s-]*""").matches(commands)) ||
+            (Regex("""\[+""").replace(commands, "").length !=
+                    Regex("""\]+""").replace(commands, "").length)) {
+        throw IllegalArgumentException()
+    } // сразу избавляемся от ошибок
     var pos = cells / 2
     val res = mutableListOf<Int>()
     repeat(cells) { res.add(0) }
