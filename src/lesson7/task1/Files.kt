@@ -76,42 +76,7 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    val str = File(inputName).readLines().toMutableList()
-    val writer = File(outputName).bufferedWriter()
-    val except = setOf<String>("жюри", "брошюра", "парашют")
-    val alphSogl = setOf<Char>('ж', 'ч', 'ш', 'щ')
-    val alph = mapOf(
-            'ы' to 'и',
-            'я' to 'а',
-            'ю' to 'у'
-    )
-    // обработка всех строк
-    str.forEach {
-        // вспомогательная переменная
-        var strT = mutableListOf<Char>()
-        // если в строке неверные сочетания
-        if (it.contains(Regex("""[Ж-жЧ-чШ-шЩ-щ][Ы-ыЯ-яЮ-ю]"""))) {
-            for (i in 0 until it.toList().size - 1) {
-                // если гласная после согласной с ошибкой
-                if ((it.toList()[i].toLowerCase() in alphSogl) &&
-                        (it.toList()[i + 1].toLowerCase() in alph.keys) &&
-                        (it !in except)) {
-                    // присваиваем переменной значения
-                    strT = it.toMutableList()
-                    // присваиваем знач-ие
-                    strT[i + 1] = alph.getValue(it.toList()[i + 1].toLowerCase())
-                    //
-                    if (it.toList()[i + 1].isUpperCase()) strT[i + 1].toUpperCase()
-                    // записываем в output
-                    writer.write(strT.joinToString(""))
-                }
-            }
-        }
-        // иначе записываем в output просто как есть
-        writer.write(it)
-        writer.newLine()
-    }
-    writer.close()
+    TODO()
 }
 
 /**
@@ -176,7 +141,7 @@ fun centerFile(inputName: String, outputName: String) {
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
     val writer = File(outputName).bufferedWriter()
-    val strList = File(inputName).readLines().map { it.trim().split(" ").map { it.trim() } }
+    val strList = File(inputName).readLines().map { it.trim().split(Regex("""\s+""")).map { it.trim() } }
     val width = mutableListOf<Int>()
     strList.forEach { width.add(it.joinToString(" ").length) }
     val maxWidth = width.max() ?: 0
@@ -351,43 +316,8 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  * (Отступы и переносы строк в примере добавлены для наглядности, при решении задачи их реализовывать не обязательно)
  */
 
-/*
-Для большей простоты, заменю мносимвольные обозначения тегов через свои,
-односимвольные обозначиеня.
-Своими обозначениями я взял такие символы из таблицы ASCII, которые
-в огромном большинстве случаев не используют в тексте.
-
-Данная функция будет заменять именно такими символами, которые во входном тексте
-никаким образом не используются. Какие символы не были бы во входных данных,
-функция найдет уникальные ASCII символы для замены
-*/
-fun asciiReplace(obj: String): List<Char> {
-    val ascii = mutableSetOf<Int>()
-    val charList = obj.toList()
-    val asciiList = mutableListOf<Char>()
-    var i = 256
-
-    for (item in charList) {
-        ascii.add(item.toInt())
-    }
-    while (asciiList.size != 3) {
-        if (!ascii.contains(i)) {
-            asciiList.add(i.toChar())
-            ascii.add(i)
-        } else i++
-    }
-    return asciiList
-}
-
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
-    val str = File(inputName).readLines()
-    val writer = File(outputName).bufferedWriter()
-
-    writer.write("<html>\n\t<body>")
-
-    writer.newLine()
-    writer.write("\t</body>\n</html>")
-    writer.close()
+    TODO()
 }
 
 /**
