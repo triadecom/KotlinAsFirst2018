@@ -2,10 +2,7 @@
 
 package lesson7.task1
 
-import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm
-import sun.font.TrueTypeFont
 import java.io.File
-import java.util.regex.Pattern
 
 /**
  * Пример
@@ -57,14 +54,11 @@ fun alignFile(inputName: String, lineLength: Int, outputName: String) {
  *
  */
 fun countSubstrings(inputName: String, substrings: List<String>): Map<String, Int> {
-    val str = File(inputName).readLines().joinToString( separator = " ").split(" ").map { it.toLowerCase() }
     val result = mutableMapOf<String, Int>()
-
-    for (substring in substrings) {
-        for (word in str) {
-        }
-    }
-
+    val str = File(inputName).readLines().map {
+        it.toLowerCase()
+    }.joinToString(separator = " ").split(" ")
+    substrings.forEach { result[it] = Regex(it.toLowerCase()).findAll(str.joinToString(separator = " ")).count() }
     return result
 }
 
@@ -82,7 +76,42 @@ fun countSubstrings(inputName: String, substrings: List<String>): Map<String, In
  *
  */
 fun sibilants(inputName: String, outputName: String) {
-    TODO()
+    val str = File(inputName).readLines().toMutableList()
+    val writer = File(outputName).bufferedWriter()
+    val except = setOf<String>("жюри", "брошюра", "парашют")
+    val alphSogl = setOf<Char>('ж', 'ч', 'ш', 'щ')
+    val alph = mapOf(
+            'ы' to 'и',
+            'я' to 'а',
+            'ю' to 'у'
+    )
+    // обработка всех строк
+    str.forEach {
+        // вспомогательная переменная
+        var strT = mutableListOf<Char>()
+        // если в строке неверные сочетания
+        if (it.contains(Regex("""[Ж-жЧ-чШ-шЩ-щ][Ы-ыЯ-яЮ-ю]"""))) {
+            for (i in 0 until it.toList().size - 1) {
+                // если гласная после согласной с ошибкой
+                if ((it.toList()[i].toLowerCase() in alphSogl) &&
+                        (it.toList()[i + 1].toLowerCase() in alph.keys) &&
+                        (it !in except)) {
+                    // присваиваем переменной значения
+                    strT = it.toMutableList()
+                    // присваиваем знач-ие
+                    strT[i + 1] = alph.getValue(it.toList()[i + 1].toLowerCase())
+                    //
+                    if (it.toList()[i + 1].isUpperCase()) strT[i + 1].toUpperCase()
+                    // записываем в output
+                    writer.write(strT.joinToString(""))
+                }
+            }
+        }
+        // иначе записываем в output просто как есть
+        writer.write(it)
+        writer.newLine()
+    }
+    writer.close()
 }
 
 /**
@@ -103,8 +132,20 @@ fun sibilants(inputName: String, outputName: String) {
  *
  */
 fun centerFile(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    val width = mutableMapOf<String, Int>()
+    File(inputName).readLines().forEach { width[it.trim()] = (it.trim().length) }
+    val maxWidth = width.values.max() ?: 0
+
+    for ((line, wid) in width) {
+        val point = (maxWidth - wid) / 2
+        repeat(point) { writer.write(" ") }
+        writer.write(line)
+        writer.newLine()
+    }
+    writer.close()
 }
+
 
 /**
  * Сложная
@@ -134,7 +175,40 @@ fun centerFile(inputName: String, outputName: String) {
  * 8) Если входной файл удовлетворяет требованиям 1-7, то он должен быть в точности идентичен выходному файлу
  */
 fun alignFileByWidth(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    val strList = File(inputName).readLines().map { it.trim().split(" ").map { it.trim() } }
+    val width = mutableListOf<Int>()
+    strList.forEach { width.add(it.joinToString(" ").length) }
+    val maxWidth = width.max() ?: 0
+
+    strList.forEach { itMap ->
+        val line = mutableListOf<String>()
+        val spaces = mutableListOf<Char>()
+        var ind = 1
+
+        if (itMap.isNotEmpty() && itMap.size > 1) {
+            repeat((maxWidth - itMap.joinToString("").length) / (itMap.size - 1)) {
+                spaces.add(' ')
+            }
+            for (i in 0 until itMap.size) {
+                line.add(itMap[i])
+                if (i != itMap.size - 1) line.add(spaces.joinToString(""))
+            }
+            if (line.joinToString("").length < maxWidth) {
+                while (line.joinToString("").length != maxWidth) {
+                    line[ind] += " "
+                    if (ind + 2 != line.size) ind += 2
+                    else ind = 1
+                }
+            }
+            writer.write(line.joinToString(""))
+        }
+        if (itMap.size == 1) writer.write(itMap.first())
+        if (itMap.isEmpty()) writer.write("")
+
+        if (itMap != strList.last()) writer.newLine()
+    }
+    writer.close()
 }
 
 /**
@@ -155,7 +229,9 @@ fun alignFileByWidth(inputName: String, outputName: String) {
  * Ключи в ассоциативном массиве должны быть в нижнем регистре.
  *
  */
-fun top20Words(inputName: String): Map<String, Int> = TODO()
+fun top20Words(inputName: String): Map<String, Int> {
+    TODO()
+}
 
 /**
  * Средняя
@@ -221,7 +297,14 @@ fun transliterate(inputName: String, dictionary: Map<Char, String>, outputName: 
  * Обратите внимание: данная функция не имеет возвращаемого значения
  */
 fun chooseLongestChaoticWord(inputName: String, outputName: String) {
-    TODO()
+    val writer = File(outputName).bufferedWriter()
+    var maxLength = 0
+    val str = File(inputName).readLines().filter {
+        it.toLowerCase().toSet().size == it.toLowerCase().toList().size
+    }
+    str.forEach { if (maxLength < it.length) maxLength = it.length }
+    writer.write(str.filter { it.length == maxLength }.joinToString(", "))
+    writer.close()
 }
 
 /**
@@ -269,92 +352,38 @@ Suspendisse <s>et elit in enim tempus iaculis</s>.
  */
 
 /*
-Для большей простоты, заменю многозначные обозначения тегов через свои,
-однозначные обозначиеня. К примеру, ** заменю на ♥ и так далее
-своими обозначениями я взял такие символы из таблицы ASCII, которые
+Для большей простоты, заменю мносимвольные обозначения тегов через свои,
+односимвольные обозначиеня.
+Своими обозначениями я взял такие символы из таблицы ASCII, которые
 в огромном большинстве случаев не используют в тексте.
-В моем случае это символы мастей карт
 
-Первый столбец - исходные обозначения
-Второй столбец - моя заменя
-Третий столбец - обозначения в тегах
-
-    *   == * == <i>
-    **  == ♥ == <b>
-    ~~  == ♦ == <s>
-    *** == ♣ == <b><i>
-
-    Для начала, функция будет искать в строке первый символ тега и второй, чтобы понять, что это именно тег
-    Потом, она присвоит им свои значения индексов
-    А далее, через индексы заменит их на теги
-    Если же спец.символ не является тегом, то произойдет обратная замена на исходные значения
-
-    Функция будет проверять все теги поочередности
-
+Данная функция будет заменять именно такими символами, которые во входном тексте
+никаким образом не используются. Какие символы не были бы во входных данных,
+функция найдет уникальные ASCII символы для замены
 */
+fun asciiReplace(obj: String): List<Char> {
+    val ascii = mutableSetOf<Int>()
+    val charList = obj.toList()
+    val asciiList = mutableListOf<Char>()
+    var i = 256
 
-val tagSet = mapOf(
-        '*' to "<i>",
-        '♥' to "<b>",
-        '♦' to "<s>",
-        '♣' to "<b><i>"
-)
-
-val tagSetClose = mapOf(
-        '*' to "</i>",
-        '♥' to "</b>",
-        '♦' to "</s>",
-        '♣' to "</b></i>"
-)
-
-fun tagCheck(obj: String): String {
-    var str = Regex("""\*\*""").replace(obj, "♥")
-    str = Regex("""~~""").replace(str, "♦")
-    str = Regex("""\*\*\*""").replace(str, "♥*")
-    val charList = str.toList()
-    var res = ""
-    var tempList = listOf<Char>()
-    val indexMap = mutableMapOf<Int, String>()
-    var tagIndex = mutableListOf<Int>()
-    var count = 0
-    var ct = 0
-    for ((tag, define) in tagSet) {
-        // цикл для каждого тега
-        for (char in charList) if (char == tag) tagIndex.add(charList.indexOf(char))
-        // добавляет индексы тегов в строку
-        if (tagIndex.size % 2 == 1) ct = tagIndex.size - 1
-        else ct = tagIndex.size
-        while (count != ct) {
-            if (tagIndex.size > 1) {
-                indexMap.put(tagIndex[count],
-                        if (count % 2 == 0) tagSet.getValue(tag)
-                        else tagSetClose.getValue(tag))
-                // задает в map значения для строковых тегов, открывающий или закрывающий
-                count++
-            } else break
-        }
-    }
     for (item in charList) {
-        for ((index, tag) in indexMap) {
-            if (charList.indexOf(item) == index) res += tag
-            else res += item
-        }
+        ascii.add(item.toInt())
     }
-    return res
+    while (asciiList.size != 3) {
+        if (!ascii.contains(i)) {
+            asciiList.add(i.toChar())
+            ascii.add(i)
+        } else i++
+    }
+    return asciiList
 }
-
 
 fun markdownToHtmlSimple(inputName: String, outputName: String) {
     val str = File(inputName).readLines()
     val writer = File(outputName).bufferedWriter()
 
     writer.write("<html>\n\t<body>")
-
-    for (item in str) {
-        val obj = item.split(" ")
-        Regex(""" """)
-    }
-
 
     writer.newLine()
     writer.write("\t</body>\n</html>")
